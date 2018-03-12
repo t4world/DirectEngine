@@ -8,11 +8,12 @@ GraphicsClass::GraphicsClass()
 {
 	m_D3D = 0;
 	m_Camera = 0;
-	m_Model = 0;
+	//m_Model = 0;
 	//m_ColorShader = 0;
-	//m_TextureShader = 0;
-	m_LightShader = 0;
-	m_Light = 0;
+	m_TextureShader = 0;
+	//m_LightShader = 0;
+	//m_Light = 0;
+	m_Bitmap = 0;
 }
 
 
@@ -57,19 +58,19 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	m_Camera->SetPosition(0.0f, 0.0f, -10.0f);
 	
 	// Create the model object.
-	m_Model = new ModelClass;
-	if(!m_Model)
-	{
-		return false;
-	}
-
-	// Initialize the model object.
-	result = m_Model->Initialize(m_D3D->GetDevice(),"../Engine/data/Cube.txt",L"../Engine/data/seafloor.dds");
-	if(!result)
-	{
-		MessageBox(hwnd, L"Could not initialize the model object.", L"Error", MB_OK);
-		return false;
-	}
+// 	m_Model = new ModelClass;
+// 	if(!m_Model)
+// 	{
+// 		return false;
+// 	}
+// 
+// 	// Initialize the model object.
+// 	result = m_Model->Initialize(m_D3D->GetDevice(),"../Engine/data/Cube.txt",L"../Engine/data/seafloor.dds");
+// 	if(!result)
+// 	{
+// 		MessageBox(hwnd, L"Could not initialize the model object.", L"Error", MB_OK);
+// 		return false;
+// 	}
 
 	// Create the color shader object.
 // 	m_ColorShader = new ColorShaderClass;
@@ -82,44 +83,57 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 //	result = m_ColorShader->Initialize(m_D3D->GetDevice(), hwnd);
 
 	//Create the texture shader object
-// 	m_TextureShader = new TextureShaderClass;
-// 	if (!m_TextureShader)
-// 	{
-// 		return false;
-// 	}
-// 	//Initialzie the texture shader object.
-// 	result = m_TextureShader->Initialize(m_D3D->GetDevice(), hwnd);
-// 	if(!result)
-// 	{
-// 		MessageBox(hwnd, L"Could not initialize the texture  shader object.", L"Error", MB_OK);
-// 		return false;
-// 	}
-	//Create the light shader object;
-	m_LightShader = new LightShaderClass;
-	if(!m_LightShader)
+	m_TextureShader = new TextureShaderClass;
+	if (!m_TextureShader)
 	{
 		return false;
 	}
-	//Initialize the light shader object
-	result = m_LightShader->Initialize(m_D3D->GetDevice(), hwnd);
+	//Initialzie the texture shader object.
+	result = m_TextureShader->Initialize(m_D3D->GetDevice(), hwnd);
 	if(!result)
 	{
-		MessageBox(hwnd, L"Could not initialize the light shader object", L"Error", MB_OK);
+		MessageBox(hwnd, L"Could not initialize the texture  shader object.", L"Error", MB_OK);
 		return false;
 	}
-
-	//Create the light object
-	m_Light = new LightClass;
-	if (!m_Light)
+// 	//Create the light shader object;
+// 	m_LightShader = new LightShaderClass;
+// 	if(!m_LightShader)
+// 	{
+// 		return false;
+// 	}
+// 	//Initialize the light shader object
+// 	result = m_LightShader->Initialize(m_D3D->GetDevice(), hwnd);
+// 	if(!result)
+// 	{
+// 		MessageBox(hwnd, L"Could not initialize the light shader object", L"Error", MB_OK);
+// 		return false;
+// 	}
+// 
+// 	//Create the light object
+// 	m_Light = new LightClass;
+// 	if (!m_Light)
+// 	{
+// 		return false;
+// 	}
+// 	//Initialize the light objec15
+// 	m_Light->SetAmbientColor(0.15f, 0.15f, 0.15f, 1.0f);
+// 	m_Light->SetDiffuseColor(1.0f, 1.0f, 1.0f, 1.0f);
+// 	m_Light->SetDirection(1.0f, 0.0f, 1.0f);
+// 	m_Light->SetSpecularColor(1.0f, 1.0f, 1.0f, 1.0f);
+// 	m_Light->SetSpecularPower(32.0f);
+	//Create the bitmap object;
+	m_Bitmap = new BitmapClass;
+	if (!m_Bitmap)
 	{
 		return false;
 	}
-	//Initialize the light objec15
-	m_Light->SetAmbientColor(0.15f, 0.15f, 0.15f, 1.0f);
-	m_Light->SetDiffuseColor(1.0f, 1.0f, 1.0f, 1.0f);
-	m_Light->SetDirection(1.0f, 0.0f, 1.0f);
-	m_Light->SetSpecularColor(1.0f, 1.0f, 1.0f, 1.0f);
-	m_Light->SetSpecularPower(32.0f);
+	//Initialize the bitmap object;
+	result = m_Bitmap->Initialize(m_D3D->GetDevice(), screenWidth, screenHeight, L"../Engine/data/seafloor.dds", 256, 256);
+	if (!result)
+	{
+		MessageBox(hwnd, L"Could not initialize the bitmap object", L"Error", MB_OK);
+		return false;
+	}
 	return true;
 }
 
@@ -135,33 +149,33 @@ void GraphicsClass::Shutdown()
 // 	}
 
 	//Release the texture shader object
-// 	if (m_TextureShader)
-// 	{
-// 		m_TextureShader->Shutdown();
-// 		delete m_TextureShader;
-// 		m_TextureShader = 0;
-// 	}
+	if (m_TextureShader)
+	{
+		m_TextureShader->Shutdown();
+		delete m_TextureShader;
+		m_TextureShader = 0;
+	}
 	//Release the light object
-	if (m_Light)
-	{
-		delete m_Light;
-		m_Light = 0;
-	}
-	//Release the light shader object
-	if (m_LightShader)
-	{
-		m_LightShader->Shutdown();
-		delete m_LightShader;
-		m_LightShader = 0;
-	}
-
-	// Release the model object.
-	if(m_Model)
-	{
-		m_Model->Shutdown();
-		delete m_Model;
-		m_Model = 0;
-	}
+// 	if (m_Light)
+// 	{
+// 		delete m_Light;
+// 		m_Light = 0;
+// 	}
+// 	//Release the light shader object
+// 	if (m_LightShader)
+// 	{
+// 		m_LightShader->Shutdown();
+// 		delete m_LightShader;
+// 		m_LightShader = 0;
+// 	}
+// 
+// 	// Release the model object.
+// 	if(m_Model)
+// 	{
+// 		m_Model->Shutdown();
+// 		delete m_Model;
+// 		m_Model = 0;
+// 	}
 
 	// Release the camera object.
 	if(m_Camera)
