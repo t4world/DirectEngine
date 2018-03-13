@@ -4,6 +4,9 @@
 
 BitmapClass::BitmapClass()
 {
+	m_vertexBuffer = 0;
+	m_indexBuffer = 0;
+	m_Texture = 0;
 }
 
 BitmapClass::BitmapClass(const BitmapClass & other)
@@ -127,7 +130,7 @@ bool BitmapClass::UpdateBuffers(ID3D11DeviceContext *deviceContext, int position
 	m_previousPosX = positionX;
 	m_previousPosY = positionY;
 	left = ((float)(m_screenWidth / 2) * -1) + (float)positionX;
-	right = left + m_bitmapWidth;
+	right = left + (float)m_bitmapWidth;
 	top = (float)(m_screenHeight / 2) - (float)positionY;
 	bottom = top - (float)m_bitmapHeight;
 	//Create the vertex array
@@ -149,8 +152,8 @@ bool BitmapClass::UpdateBuffers(ID3D11DeviceContext *deviceContext, int position
 	vertices[3].texture = D3DXVECTOR2(0.0f, 0.0f);
 	vertices[4].position = D3DXVECTOR3(right, top, 0.0f);//Top right;
 	vertices[4].texture = D3DXVECTOR2(1.0f, 0.0f);
-	vertices[2].position = D3DXVECTOR3(right, bottom, 0.0f);//Bottom right;
-	vertices[2].texture = D3DXVECTOR2(1.0f, 1.0f);
+	vertices[5].position = D3DXVECTOR3(right, bottom, 0.0f);//Bottom right;
+	vertices[5].texture = D3DXVECTOR2(1.0f, 1.0f);
 	result = deviceContext->Map(m_vertexBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 	if (FAILED(result))
 	{
