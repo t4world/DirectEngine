@@ -1,0 +1,31 @@
+Texture2D shaderTexture;
+SampleState sampleType;
+
+cbuffer PixelBuffer
+{
+	float4 pixelColor;
+};
+
+struct PixelInputType
+{
+	float4 position:SV_POSITION;
+	float2 texture:TEXCOORD0;
+};
+
+float4 FontPixelShader(PixelInputType input):SV_TARGET
+{
+	float4 color;
+	//sample the texture pixel at the location
+	color = shaderTexture.Sample(sampleType,input.texture);
+	//if the color is black on the texture then treat this pixel as transparent.
+	if(color.r == 0.0f)
+	{
+		color.a = 1.0f;
+	}
+	else
+	{
+		color.a = 1.0f;
+		color = color * pixelColor;
+	}
+	return color;
+}

@@ -50,7 +50,47 @@ ID3D11ShaderResourceView * FontClass::GetTexture()
 
 void FontClass::BuildVertexArray(void* vertices, char *sentence, float drawnX, float drawnY)
 {
-
+	VertexType *vertexPtr;
+	int numLetters;
+	int index;
+	int i;
+	int letter;
+	//Coerce the input vertices into the VertexType structure.
+	vertexPtr = (VertexType *)vertices;
+	numLetters = (int)strlen(sentence);
+	index = 0;
+	for (i = 0 ;i < numLetters;++i)
+	{
+		letter = ((int)sentence[i]) - 32;
+		if (letter == 0)
+		{
+			drawnX += 3.0f;
+		}
+		else
+		{
+			//First triangle in quad;
+			vertexPtr[index].position = D3DXVECTOR3(drawnX, drawnY, 0.0f);//top left;
+			vertexPtr[index].texture = D3DXVECTOR2(m_Font[letter].left, 0.0f);
+			++index;
+			vertexPtr[index].position = D3DXVECTOR3(drawnX + m_Font[letter].size, drawnY - 16, 0.0f);//bottom right;
+			vertexPtr[index].texture = D3DXVECTOR2(m_Font[letter].right, 1.0f);
+			++index;
+			vertexPtr[index].position = D3DXVECTOR3(drawnX , drawnY - 16, 0.0f);//bottom left;
+			vertexPtr[index].texture = D3DXVECTOR2(m_Font[letter].left, 1.0f);
+			++index;
+			vertexPtr[index].position = D3DXVECTOR3(drawnX, drawnY, 0.0f);//top left;
+			vertexPtr[index].texture = D3DXVECTOR2(m_Font[letter].left, 0.0f);
+			++index;
+			vertexPtr[index].position = D3DXVECTOR3(drawnX +m_Font[letter].size, drawnY, 0.0f);//top right;
+			vertexPtr[index].texture = D3DXVECTOR2(m_Font[letter].right, 0.0f);
+			++index;
+			vertexPtr[index].position = D3DXVECTOR3(drawnX + m_Font[letter].size, drawnY - 16, 0.0f);//bottom right;
+			vertexPtr[index].texture = D3DXVECTOR2(m_Font[letter].right, 1.0f);
+			++index;
+			//Update the x location for drawing by the size of the letter and one pixel
+			drawnX = drawnX + m_Font[letter].size + 1.0f;
+		}
+	}
 }
 
 bool FontClass::LoadFontData(char *fileName)
