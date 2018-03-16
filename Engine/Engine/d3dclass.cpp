@@ -392,7 +392,11 @@ bool D3DClass::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hw
 		return false;
 	}
 	blendStateDescription.RenderTarget[0].BlendEnable = FALSE;
-	//result = m
+	result = m_device->CreateBlendState(&blendStateDescription, &m_alphaDisableBlendingState);
+	if (FAILED(result))
+	{
+		return false;
+	}
     return true;
 }
 
@@ -405,6 +409,17 @@ void D3DClass::Shutdown()
 		m_swapChain->SetFullscreenState(false, NULL);
 	}
 
+	if (m_alphaEnableBlendingState)
+	{
+		m_alphaEnableBlendingState->Release();
+		m_alphaEnableBlendingState = 0;
+	}
+
+	if (m_alphaDisableBlendingState)
+	{
+		m_alphaDisableBlendingState->Release();
+		m_alphaDisableBlendingState = 0;
+	}
 	if (m_depthDisabledStencilState)
 	{
 		m_depthDisabledStencilState->Release();

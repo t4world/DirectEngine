@@ -77,7 +77,7 @@ bool FontShaderClass::InitializeShader(ID3D11Device *device, HWND hwnd, WCHAR *v
 		}
 		return false;
 	}
-	result = D3DX11CompileFromFile(psShaderFile, NULL, NULL, "FontPixelShader", "vs_5_0", D3D10_SHADER_ENABLE_STRICTNESS, 0, NULL, &pixelShaderBuffer, &errorMessage, NULL);
+	result = D3DX11CompileFromFile(psShaderFile, NULL, NULL, "FontPixelShader", "ps_5_0", D3D10_SHADER_ENABLE_STRICTNESS, 0, NULL, &pixelShaderBuffer, &errorMessage, NULL);
 	if (FAILED(result))
 	{
 		if (errorMessage)
@@ -196,6 +196,12 @@ void FontShaderClass::ShutdownShader()
 		m_constantBuffer->Release();
 		m_constantBuffer = 0;
 	}
+	// Release the pixel shader.
+	if (m_pixelShader)
+	{
+		m_pixelShader->Release();
+		m_pixelShader = 0;
+	}
 	if (m_pixelShader)
 	{
 		m_pixelShader->Release();
@@ -269,7 +275,7 @@ bool FontShaderClass::SetShaderParameters(ID3D11DeviceContext *deviceContext, D3
 	//Unlock the pixel consant buffer;
 	deviceContext->Unmap(m_pixelBuffer, 0);
 	bufferNum = 0;
-	deviceContext->PSSetConstantBuffers(bufferNum, 0, &m_pixelBuffer);
+	deviceContext->PSSetConstantBuffers(bufferNum, 1, &m_pixelBuffer);
 	return true;
 
 }

@@ -35,7 +35,7 @@ public:
 	~TextClass();
 
 	bool Initialize(ID3D11Device *device, ID3D11DeviceContext *deviceContext, HWND hwnd, int screenWidth, int screenHeight, D3DXMATRIX baseViewMatrix);
-	bool Shutdown();
+	void Shutdown();
 	bool Render(ID3D11DeviceContext *deviceContext, D3DXMATRIX worldMatrix, D3DXMATRIX orthoMatrix);
 private: 
 	bool InitializeSentence(SentenceType **sentence, int maxLength, ID3D11Device *device);

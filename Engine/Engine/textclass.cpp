@@ -63,7 +63,7 @@ bool TextClass::Initialize(ID3D11Device *device, ID3D11DeviceContext *deviceCont
 	{
 		return false;
 	}
-	result = UpdateSentence(m_sentence2, "GoodsBye", 100, 200, 1.0f, 1.0f, 0.0f, deviceContext);
+	result = UpdateSentence(m_sentence2, "GoodsBye", 100, 200, 0.0f, 1.0f, 0.0f, deviceContext);
 	if (!result)
 	{
 		return false;
@@ -71,7 +71,7 @@ bool TextClass::Initialize(ID3D11Device *device, ID3D11DeviceContext *deviceCont
 	return true;
 }
 
-bool TextClass::Shutdown()
+void TextClass::Shutdown()
 {
 	//Release the first sentence
 	ReleaseSentence(&m_sentence1);
@@ -217,7 +217,7 @@ bool TextClass::UpdateSentence(SentenceType *sentence, char *text, int positionX
 	//Initialzie vertex array to zero at first;
 	memset(verices, 0, sizeof(VertexType) * sentence->vertexCount);
 	drawX = (float)((m_screenWidth / 2.0f * -1.0f) +positionX);
-	drawY = (float)((m_screenHeight / 2.0f) - positionX);
+	drawY = (float)((m_screenHeight / 2.0f) - positionY);
 	//Use the font class to build the vertex array from the sentence text and sentence draw location
 	m_Font->BuildVertexArray((void*)verices, text, drawX, drawY);
 	//Lock the vertex buffer so it can be written to
@@ -267,13 +267,13 @@ bool TextClass::RenderSentence(ID3D11DeviceContext *deviceContext, SentenceType 
 	offset = 0;
 
 	//Set the vertex buffer to active in the input assembler so it can be rendered
-	deviceContext->IASetVertexBuffers(0, 1, &(sentence->vertexBuffer), &stride, &offset);
+	deviceContext->IASetVertexBuffers(0, 1, &sentence->vertexBuffer, &stride, &offset);
 	deviceContext->IASetIndexBuffer(sentence->indexBuffer,DXGI_FORMAT_R32_UINT,0);
 	deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	//Create a pixel color vector with the input sentence color
 	pixelColor = D3DXVECTOR4(sentence->red, sentence->green, sentence->blue, 1.0f);
 	result = m_FontShader->Render(deviceContext, sentence->indexCount, worldMatrix, m_baseViewMatrix, orthoMatrix, m_Font->GetTexture(), pixelColor);
-	if (FAILED(result))
+	if (!result)
 	{
 		return false;
 	}

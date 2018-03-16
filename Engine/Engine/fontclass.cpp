@@ -38,9 +38,9 @@ bool FontClass::Initialize(ID3D11Device *device, char *fontFileName, WCHAR *text
 void FontClass::Shutdown()
 {
 	//Release the font texture
-	ReleaseFontData();
-	//Release the font data;
 	ReleaseTexture();
+	//Release the font data;
+	ReleaseFontData();
 }
 
 ID3D11ShaderResourceView * FontClass::GetTexture()
@@ -101,6 +101,11 @@ bool FontClass::LoadFontData(char *fileName)
 	//Create the font spacing buffer.
 	m_Font = new FontType[95];
 	if (!m_Font)
+	{
+		return false;
+	}
+	fin.open(fileName);
+	if (fin.fail())
 	{
 		return false;
 	}
