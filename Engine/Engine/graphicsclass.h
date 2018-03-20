@@ -21,8 +21,7 @@
 #include "textclass.h"
 #include "frustumclass.h"
 #include "modellistclass.h"
-#include <string>
-using namespace std;
+#include "multitextureshaderclass.h"
 
 
 /////////////
@@ -63,6 +62,7 @@ private:
 	TextClass *m_Text;
 	ModelListClass *m_ModelList;
 	FrustumClass *m_Frustum;
+	MultiTextureShaderClass *m_MultiTextureShader;
 	
 };
 

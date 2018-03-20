@@ -17,6 +17,7 @@ GraphicsClass::GraphicsClass()
 	m_Text = 0;
 	m_ModelList = 0;
 	m_Frustum = 0;
+	m_MultiTextureShader = 0;
 }
 
 
