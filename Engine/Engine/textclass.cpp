@@ -457,19 +457,18 @@ bool TextClass::SetCpu(int cpu, ID3D11DeviceContext *deviceContext)
 	return true;
 }
 
-bool TextClass::SetText(char const *content, ID3D11DeviceContext *deviceContext)
+bool TextClass::SetText(int content, ID3D11DeviceContext *deviceContext)
 {
+	char tempString[16];
 	char cpuString[16];
 	float red;
 	float green;
 	float blue;
 	bool result;
-	int lenght = strlen(content);
-	if (lenght > 16)
-	{
-		lenght = 16;
-	}
-	strcpy_s(cpuString,content);
+	_itoa_s(content, tempString, 10);
+	strcpy_s(cpuString, "DrawNum:");
+	strcat_s(cpuString, tempString);
+
 	red = 0.0f;
 	green = 1.0f;
 	blue = 0.0f;
@@ -479,5 +478,6 @@ bool TextClass::SetText(char const *content, ID3D11DeviceContext *deviceContext)
 	{
 		return false;
 	}
+
 	return true;
 }

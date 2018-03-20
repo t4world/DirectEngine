@@ -42,7 +42,7 @@ public:
 	bool SetFps(int fps, ID3D11DeviceContext *deviceContext);
 	bool SetCpu(int cpu, ID3D11DeviceContext *deviceContext);
 
-	bool SetText(char const *content, ID3D11DeviceContext *deviceContext);
+	bool SetText(int content, ID3D11DeviceContext *deviceContext);
 
 private:
 	bool InitializeSentence(SentenceType**, int, ID3D11Device*);

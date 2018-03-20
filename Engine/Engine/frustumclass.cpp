@@ -24,6 +24,7 @@ void FrustumClass::ConsturctFrustum(float screenDepth, D3DXMATRIX projectionMatr
 	r = screenDepth / (screenDepth - zMinimum);
 	projectionMatrix._33 = r;
 	projectionMatrix._43 = -r * zMinimum;
+	D3DXMatrixMultiply(&matrix, &viewMatrix, &projectionMatrix);
 	// Calculate near plane of frustum.
 	m_planes[0].a = matrix._14 + matrix._13;
 	m_planes[0].b = matrix._24 + matrix._23;

@@ -263,7 +263,7 @@ bool GraphicsClass::Frame(float rotationY)
 {
 	bool result;
 
-	static float rotation = 0.0f;
+//	static float rotation = 0.0f;
 // 	//Update the rotation variable each frame
 // 	rotation += (float)D3DX_PI * 0.005f;
 // 		if (rotation > 360.0f)
@@ -326,9 +326,7 @@ bool GraphicsClass::Render()
 			renderCount++;
 		}
 	}
-	string tem = to_string(renderCount);
-	char const *pChar = tem.c_str();
-	result = m_Text->SetText(pChar, m_D3D->GetDeviceContext());
+	result = m_Text->SetText(renderCount, m_D3D->GetDeviceContext());
 	if (!result)
 	{
 		return false;
