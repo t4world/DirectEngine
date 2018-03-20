@@ -69,20 +69,142 @@ void FrustumClass::ConsturctFrustum(float screenDepth, D3DXMATRIX projectionMatr
 
 bool FrustumClass::CheckPoint(float x, float y, float z)
 {
+	int i;
 
+
+	// Check if the point is inside all six planes of the view frustum.
+	for (i = 0; i < 6; i++)
+	{
+		if (D3DXPlaneDotCoord(&m_planes[i], &D3DXVECTOR3(x, y, z)) < 0.0f)
+		{
+			return false;
+		}
+	}
+
+	return true;
 }
 
-bool FrustumClass::CheckCube(float centerX, float centerY, float centerZ, float radius)
+bool FrustumClass::CheckCube(float xCenter, float yCenter, float zCenter, float radius)
 {
+	int i;
 
+
+	// Check if any one point of the cube is in the view frustum.
+	for (i = 0; i < 6; i++)
+	{
+		if (D3DXPlaneDotCoord(&m_planes[i], &D3DXVECTOR3((xCenter - radius), (yCenter - radius), (zCenter - radius))) >= 0.0f)
+		{
+			continue;
+		}
+
+		if (D3DXPlaneDotCoord(&m_planes[i], &D3DXVECTOR3((xCenter + radius), (yCenter - radius), (zCenter - radius))) >= 0.0f)
+		{
+			continue;
+		}
+
+		if (D3DXPlaneDotCoord(&m_planes[i], &D3DXVECTOR3((xCenter - radius), (yCenter + radius), (zCenter - radius))) >= 0.0f)
+		{
+			continue;
+		}
+
+		if (D3DXPlaneDotCoord(&m_planes[i], &D3DXVECTOR3((xCenter + radius), (yCenter + radius), (zCenter - radius))) >= 0.0f)
+		{
+			continue;
+		}
+
+		if (D3DXPlaneDotCoord(&m_planes[i], &D3DXVECTOR3((xCenter - radius), (yCenter - radius), (zCenter + radius))) >= 0.0f)
+		{
+			continue;
+		}
+
+		if (D3DXPlaneDotCoord(&m_planes[i], &D3DXVECTOR3((xCenter + radius), (yCenter - radius), (zCenter + radius))) >= 0.0f)
+		{
+			continue;
+		}
+
+		if (D3DXPlaneDotCoord(&m_planes[i], &D3DXVECTOR3((xCenter - radius), (yCenter + radius), (zCenter + radius))) >= 0.0f)
+		{
+			continue;
+		}
+
+		if (D3DXPlaneDotCoord(&m_planes[i], &D3DXVECTOR3((xCenter + radius), (yCenter + radius), (zCenter + radius))) >= 0.0f)
+		{
+			continue;
+		}
+
+		return false;
+	}
+
+	return true;
 }
 
-bool FrustumClass::CheckSphere(float centerX, float centerY, float centerZ, float radius)
+bool FrustumClass::CheckSphere(float xCenter, float yCenter, float zCenter, float radius)
 {
+	int i;
 
+
+	// Check if the radius of the sphere is inside the view frustum.
+	for (i = 0; i < 6; i++)
+	{
+		if (D3DXPlaneDotCoord(&m_planes[i], &D3DXVECTOR3(xCenter, yCenter, zCenter)) < -radius)
+		{
+			return false;
+		}
+	}
+
+	return true;
 }
 
-bool FrustumClass::CheckRectangle(float centerX, float centerY, float centerZ, float xSize, float ySize, float zSize)
+bool FrustumClass::CheckRectangle(float xCenter, float yCenter, float zCenter, float xSize, float ySize, float zSize)
 {
+	int i;
 
+
+	// Check if any of the 6 planes of the rectangle are inside the view frustum.
+	for (i = 0; i < 6; i++)
+	{
+		if (D3DXPlaneDotCoord(&m_planes[i], &D3DXVECTOR3((xCenter - xSize), (yCenter - ySize), (zCenter - zSize))) >= 0.0f)
+		{
+			continue;
+		}
+
+		if (D3DXPlaneDotCoord(&m_planes[i], &D3DXVECTOR3((xCenter + xSize), (yCenter - ySize), (zCenter - zSize))) >= 0.0f)
+		{
+			continue;
+		}
+
+		if (D3DXPlaneDotCoord(&m_planes[i], &D3DXVECTOR3((xCenter - xSize), (yCenter + ySize), (zCenter - zSize))) >= 0.0f)
+		{
+			continue;
+		}
+
+		if (D3DXPlaneDotCoord(&m_planes[i], &D3DXVECTOR3((xCenter - xSize), (yCenter - ySize), (zCenter + zSize))) >= 0.0f)
+		{
+			continue;
+		}
+
+		if (D3DXPlaneDotCoord(&m_planes[i], &D3DXVECTOR3((xCenter + xSize), (yCenter + ySize), (zCenter - zSize))) >= 0.0f)
+		{
+			continue;
+		}
+
+		if (D3DXPlaneDotCoord(&m_planes[i], &D3DXVECTOR3((xCenter + xSize), (yCenter - ySize), (zCenter + zSize))) >= 0.0f)
+		{
+			continue;
+		}
+
+		if (D3DXPlaneDotCoord(&m_planes[i], &D3DXVECTOR3((xCenter - xSize), (yCenter + ySize), (zCenter + zSize))) >= 0.0f)
+		{
+			continue;
+		}
+
+		if (D3DXPlaneDotCoord(&m_planes[i], &D3DXVECTOR3((xCenter + xSize), (yCenter + ySize), (zCenter + zSize))) >= 0.0f)
+		{
+			continue;
+		}
+
+		return false;
+	}
+
+	return true;
 }

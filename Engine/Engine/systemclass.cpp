@@ -8,6 +8,8 @@ SystemClass::SystemClass()
 {
 	m_Input = 0;
 	m_Graphics = 0;
+	m_Timer = 0;
+	m_Position = 0;
 }
 
 
@@ -42,7 +44,7 @@ bool SystemClass::Initialize()
 	}
 
 	// Initialize the input object.
-	m_Input->Initialize();
+	m_Input->Initialize(m_hinstance,m_hwnd,screenWidth,screenHeight);
 
 	// Create the graphics object.  This object will handle rendering all the graphics for this application.
 	m_Graphics = new GraphicsClass;
@@ -57,13 +59,40 @@ bool SystemClass::Initialize()
 	{
 		return false;
 	}
-	
+	m_Timer = new TimerClass;
+	if (!m_Timer)
+	{
+		return false;
+	}
+	result = m_Timer->Initialize();
+	if (!result)
+	{
+		MessageBox(m_hwnd, L"Could not initialize the Timer object", L"Error", MB_OK);
+		return false;
+	}
+
+	m_Position = new PositionClass;
+	if (!m_Position)
+	{
+		return false;
+	}
 	return true;
 }
 
 
 void SystemClass::Shutdown()
 {
+	if (m_Position)
+	{
+		delete m_Position;
+		m_Position = 0;
+	}
+
+	if (m_Timer)
+	{
+		delete m_Timer;
+		m_Timer = 0;
+	}
 	// Release the graphics object.
 	if(m_Graphics)
 	{
@@ -130,17 +159,31 @@ void SystemClass::Run()
 bool SystemClass::Frame()
 {
 	bool result;
+	bool keyDown;
+	float rotationY;
 
+	m_Timer->Frame();
+	result = m_Input->Frame();
+	if (!result)
+	{
+		return false;
+	}
+	m_Position->SetFrameTime(m_Timer->GetTime());
 
-	// Check if the user pressed escape and wants to exit the application.
-	if(m_Input->IsKeyDown(VK_ESCAPE))
+	keyDown =  m_Input->IsLeftArrowPressed();
+	m_Position->TurnLeft(keyDown);
+	keyDown = m_Input->IsRightArrowPressed();
+	m_Position->TurnRight(keyDown);
+
+	m_Position->GetRotation(rotationY);
+	result = m_Graphics->Frame(rotationY);
+	if (!result)
 	{
 		return false;
 	}
 
-	// Do the frame processing for the graphics object.
-	result = m_Graphics->Frame();
-	if(!result)
+	// Check if the user pressed escape and wants to exit the application.
+	if (m_Input->IsEscapePressed())
 	{
 		return false;
 	}
@@ -151,30 +194,7 @@ bool SystemClass::Frame()
 
 LRESULT CALLBACK SystemClass::MessageHandler(HWND hwnd, UINT umsg, WPARAM wparam, LPARAM lparam)
 {
-	switch(umsg)
-	{
-		// Check if a key has been pressed on the keyboard.
-		case WM_KEYDOWN:
-		{
-			// If a key is pressed send it to the input object so it can record that state.
-			m_Input->KeyDown((unsigned int)wparam);
-			return 0;
-		}
-
-		// Check if a key has been released on the keyboard.
-		case WM_KEYUP:
-		{
-			// If a key is released then send it to the input object so it can unset the state for that key.
-			m_Input->KeyUp((unsigned int)wparam);
-			return 0;
-		}
-
-		// Any other messages send to the default message handler as our application won't make use of them.
-		default:
-		{
-			return DefWindowProc(hwnd, umsg, wparam, lparam);
-		}
-	}
+	return DefWindowProc(hwnd, umsg, wparam, lparam);
 }
 
 

@@ -22,6 +22,8 @@
 ///////////////////////
 #include "inputclass.h"
 #include "graphicsclass.h"
+#include "timerclass.h"
+#include "positionclass.h"
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -52,6 +54,8 @@ private:
 
 	InputClass* m_Input;
 	GraphicsClass* m_Graphics;
+	TimerClass *m_Timer;
+	PositionClass *m_Position;
 };
 
 

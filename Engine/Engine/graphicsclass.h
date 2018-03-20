@@ -10,16 +10,19 @@
 ///////////////////////
 #include "d3dclass.h"
 #include "cameraclass.h"
-//#include "modelclass.h"
+#include "modelclass.h"
 
 //#include "colorshaderclass.h"
 //#include "textureshaderclass.h"
 
-//#include "lightshaderclass.h"
-//#include "lightclass.h"
+#include "lightshaderclass.h"
+#include "lightclass.h"
 //#include "bitmapclass.h"
-
 #include "textclass.h"
+#include "frustumclass.h"
+#include "modellistclass.h"
+#include <string>
+using namespace std;
 
 
 /////////////
@@ -43,21 +46,23 @@ public:
 
 	bool Initialize(int, int, HWND);
 	void Shutdown();
-	bool Frame();
+	bool Frame(float rotationY);
 
 private:
-	bool Render(float rotation);
+	bool Render();
 
 private:
 	D3DClass* m_D3D;
 	CameraClass* m_Camera;
-	//ModelClass* m_Model;
+	ModelClass* m_Model;
 	//ColorShaderClass* m_ColorShader;
 	//TextureShaderClass *m_TextureShader;
-	//LightShaderClass *m_LightShader;
-	//LightClass *m_Light;
+	LightShaderClass *m_LightShader;
+	LightClass *m_Light;
 	//BitmapClass *m_Bitmap;
 	TextClass *m_Text;
+	ModelListClass *m_ModelList;
+	FrustumClass *m_Frustum;
 	
 };
 

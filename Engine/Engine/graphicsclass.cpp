@@ -8,18 +8,21 @@ GraphicsClass::GraphicsClass()
 {
 	m_D3D = 0;
 	m_Camera = 0;
-	//m_Model = 0;
+	m_Model = 0;
 	//m_ColorShader = 0;
 	//m_TextureShader = 0;
-	//m_LightShader = 0;
-	//m_Light = 0;
+	m_LightShader = 0;
+	m_Light = 0;
 	//m_Bitmap = 0;
 	m_Text = 0;
+	m_ModelList = 0;
+	m_Frustum = 0;
 }
 
 
 GraphicsClass::GraphicsClass(const GraphicsClass& other)
 {
+
 }
 
 
@@ -61,19 +64,19 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	m_Camera->GetViewMatrix(baseViewMatrix);
 	
 	// Create the model object.
-// 	m_Model = new ModelClass;
-// 	if(!m_Model)
-// 	{
-// 		return false;
-// 	}
-// 
-// 	// Initialize the model object.
-// 	result = m_Model->Initialize(m_D3D->GetDevice(),"../Engine/data/Cube.txt",L"../Engine/data/seafloor.dds");
-// 	if(!result)
-// 	{
-// 		MessageBox(hwnd, L"Could not initialize the model object.", L"Error", MB_OK);
-// 		return false;
-// 	}
+	m_Model = new ModelClass;
+	if(!m_Model)
+	{
+		return false;
+	}
+
+	// Initialize the model object.
+	result = m_Model->Initialize(m_D3D->GetDevice(),"../Engine/data/sphere.txt",L"../Engine/data/seafloor.dds");
+	if(!result)
+	{
+		MessageBox(hwnd, L"Could not initialize the model object.", L"Error", MB_OK);
+		return false;
+	}
 
 	// Create the color shader object.
 // 	m_ColorShader = new ColorShaderClass;
@@ -98,32 +101,32 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 // 		MessageBox(hwnd, L"Could not initialize the texture  shader object.", L"Error", MB_OK);
 // 		return false;
 // 	}
-// 	//Create the light shader object;
-// 	m_LightShader = new LightShaderClass;
-// 	if(!m_LightShader)
-// 	{
-// 		return false;
-// 	}
-// 	//Initialize the light shader object
-// 	result = m_LightShader->Initialize(m_D3D->GetDevice(), hwnd);
-// 	if(!result)
-// 	{
-// 		MessageBox(hwnd, L"Could not initialize the light shader object", L"Error", MB_OK);
-// 		return false;
-// 	}
-// 
-// 	//Create the light object
-// 	m_Light = new LightClass;
-// 	if (!m_Light)
-// 	{
-// 		return false;
-// 	}
-// 	//Initialize the light objec15
-// 	m_Light->SetAmbientColor(0.15f, 0.15f, 0.15f, 1.0f);
-// 	m_Light->SetDiffuseColor(1.0f, 1.0f, 1.0f, 1.0f);
-// 	m_Light->SetDirection(1.0f, 0.0f, 1.0f);
-// 	m_Light->SetSpecularColor(1.0f, 1.0f, 1.0f, 1.0f);
-// 	m_Light->SetSpecularPower(32.0f);
+	//Create the light shader object;
+	m_LightShader = new LightShaderClass;
+	if(!m_LightShader)
+	{
+		return false;
+	}
+	//Initialize the light shader object
+	result = m_LightShader->Initialize(m_D3D->GetDevice(), hwnd);
+	if(!result)
+	{
+		MessageBox(hwnd, L"Could not initialize the light shader object", L"Error", MB_OK);
+		return false;
+	}
+
+	//Create the light object
+	m_Light = new LightClass;
+	if (!m_Light)
+	{
+		return false;
+	}
+	//Initialize the light objec15
+	m_Light->SetDirection(1.0f, 0.0f, 1.0f);
+	m_Light->SetAmbientColor(0.15f, 0.15f, 0.15f, 1.0f);
+	m_Light->SetDiffuseColor(1.0f, 1.0f, 1.0f, 1.0f);
+	m_Light->SetSpecularColor(1.0f, 1.0f, 1.0f, 1.0f);
+	m_Light->SetSpecularPower(32.0f);
 	//Create the bitmap object;
 // 	m_Bitmap = new BitmapClass;
 // 	if (!m_Bitmap)
@@ -149,12 +152,41 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 		MessageBox(hwnd, L"Could not initialize the text object.", L"Error", MB_OK);
 		return false;
 	}
+
+	m_ModelList = new ModelListClass;
+	if (!m_ModelList)
+	{
+		return false;
+	}
+	result = m_ModelList->Initialize(25);
+	if (!result)
+	{
+		MessageBox(hwnd, L"Could not initialize the model list object", L"Error", MB_OK);
+		return false;
+	}
+
+	m_Frustum = new FrustumClass;
+	if (!m_Frustum)
+	{
+		return false;
+	}
 	return true;
 }
 
 
 void GraphicsClass::Shutdown()
 {
+	if (m_Frustum)
+	{
+		delete m_Frustum;
+		m_Frustum = 0;
+	}
+	if (m_ModelList)
+	{
+		m_ModelList->Shutdown();
+		delete m_ModelList;
+		m_ModelList = 0;
+	}
 	// Release the color shader object.
 // 	if(m_ColorShader)
 // 	{
@@ -179,26 +211,26 @@ void GraphicsClass::Shutdown()
 // 		m_TextureShader = 0;
 // 	}
 	//Release the light object
-// 	if (m_Light)
-// 	{
-// 		delete m_Light;
-// 		m_Light = 0;
-// 	}
-// 	//Release the light shader object
-// 	if (m_LightShader)
-// 	{
-// 		m_LightShader->Shutdown();
-// 		delete m_LightShader;
-// 		m_LightShader = 0;
-// 	}
-// 
-// 	// Release the model object.
-// 	if(m_Model)
-// 	{
-// 		m_Model->Shutdown();
-// 		delete m_Model;
-// 		m_Model = 0;
-// 	}
+	if (m_Light)
+	{
+		delete m_Light;
+		m_Light = 0;
+	}
+	//Release the light shader object
+	if (m_LightShader)
+	{
+		m_LightShader->Shutdown();
+		delete m_LightShader;
+		m_LightShader = 0;
+	}
+
+	// Release the model object.
+	if(m_Model)
+	{
+		m_Model->Shutdown();
+		delete m_Model;
+		m_Model = 0;
+	}
 
 	//Release the text object;
 	if (m_Text)
@@ -227,7 +259,7 @@ void GraphicsClass::Shutdown()
 }
 
 
-bool GraphicsClass::Frame()
+bool GraphicsClass::Frame(float rotationY)
 {
 	bool result;
 
@@ -239,7 +271,9 @@ bool GraphicsClass::Frame()
 // 			rotation -= 360.0f;
 // 		}
 // 		// Render the graphics scene.
-	result = Render(rotation);
+	m_Camera->SetPosition(0.0f, 0.0f, -10.0f);
+	m_Camera->SetRotation(0.0, rotationY, 0.0f);
+	result = Render();
 	if(!result)
 	{
 		return false;
@@ -249,15 +283,24 @@ bool GraphicsClass::Frame()
 }
 
 
-bool GraphicsClass::Render(float rotation)
+bool GraphicsClass::Render()
 {
 	D3DXMATRIX worldMatrix, viewMatrix, projectionMatrix, orthoMatrix;
+	int modelCount;
+	int renderCount;
+	int index;
+	float positionX;
+	float positionY;
+	float positionZ;
+	float radius;
+	D3DXVECTOR4 color;
 	bool result;
+	bool renderModel;
 
 
 	// Clear the buffers to begin the scene.
 	m_D3D->BeginScene(0.0f, 0.0f, 0.0f, 1.0f);
-
+	renderCount = 0;
 	// Generate the view matrix based on the camera's position.
 	m_Camera->Render();
 
@@ -266,6 +309,30 @@ bool GraphicsClass::Render(float rotation)
 	m_D3D->GetWorldMatrix(worldMatrix);
 	m_D3D->GetProjectionMatrix(projectionMatrix);
 	m_D3D->GetOrthoMatrix(orthoMatrix);
+	m_Frustum->ConsturctFrustum(SCREEN_DEPTH, projectionMatrix, viewMatrix);
+	modelCount = m_ModelList->GetModelCount();
+	for (index = 0; index< modelCount;index++)
+	{
+		m_ModelList->GetData(index, positionX, positionY, positionZ, color);
+		radius = 1.0f;
+		renderModel = m_Frustum->CheckSphere(positionX, positionY, positionZ, radius);
+		if (renderModel)
+		{
+			D3DXMatrixTranslation(&worldMatrix, positionX, positionY, positionZ);
+			m_Model->Render(m_D3D->GetDeviceContext());
+			m_LightShader->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix, m_Model->GetTexture(), m_Light->GetDirection(), color, m_Light->GetDiffuseColor(), m_Camera->GetPosition(), m_Light->GetSpecularColor(), m_Light->GetSpecularPower());
+			//Reset the world matrix;
+			m_D3D->GetWorldMatrix(worldMatrix);
+			renderCount++;
+		}
+	}
+	string tem = to_string(renderCount);
+	char const *pChar = tem.c_str();
+	result = m_Text->SetText(pChar, m_D3D->GetDeviceContext());
+	if (!result)
+	{
+		return false;
+	}
 	m_D3D->TurnZBufferOff();
 	//Rotate the world matrix by the rotation value so that the triangle will spin.
 	//D3DXMatrixRotationY(&worldMatrix, rotation);
