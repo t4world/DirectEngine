@@ -56,12 +56,12 @@ private:
 	ModelClass* m_Model;
 	//ColorShaderClass* m_ColorShader;
 	//TextureShaderClass *m_TextureShader;
-	LightShaderClass *m_LightShader;
-	LightClass *m_Light;
+	//LightShaderClass *m_LightShader;
+	//LightClass *m_Light;
 	//BitmapClass *m_Bitmap;
-	TextClass *m_Text;
-	ModelListClass *m_ModelList;
-	FrustumClass *m_Frustum;
+	//TextClass *m_Text;
+	//ModelListClass *m_ModelList;
+	//FrustumClass *m_Frustum;
 	MultiTextureShaderClass *m_MultiTextureShader;
 	
 };
