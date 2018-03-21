@@ -20,9 +20,9 @@ struct PixelInputType
 PixelInputType MultiTextureVertexShader(VertexInputType input)
 {
 	PixelInputType output;
-	output.position = mul(worldMatrix,input.position);
-	output.position = mul(viewMatrix,output.position);
-	output.position = mul(projectionMatrix,output.position);
+	output.position = mul(input.position,worldMatrix);
+	output.position = mul(output.position,viewMatrix);
+	output.position = mul(output.position,projectionMatrix);
 	output.tex = input.tex;
 	return output;
 }

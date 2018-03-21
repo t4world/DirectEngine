@@ -305,21 +305,21 @@ bool GraphicsClass::Frame(float rotationY)
 bool GraphicsClass::Render()
 {
 	D3DXMATRIX worldMatrix, viewMatrix, projectionMatrix, orthoMatrix;
-	int modelCount;
-	int renderCount;
-	int index;
-	float positionX;
-	float positionY;
-	float positionZ;
-	float radius;
-	D3DXVECTOR4 color;
-	bool result;
-	bool renderModel;
+// 	int modelCount;
+// 	int renderCount;
+// 	int index;
+// 	float positionX;
+// 	float positionY;
+// 	float positionZ;
+// 	float radius;
+// 	D3DXVECTOR4 color;
+// 	bool result;
+// 	bool renderModel;
 
 
 	// Clear the buffers to begin the scene.
 	m_D3D->BeginScene(0.0f, 0.0f, 0.0f, 1.0f);
-	renderCount = 0;
+//	renderCount = 0;
 	// Generate the view matrix based on the camera's position.
 	m_Camera->Render();
 
