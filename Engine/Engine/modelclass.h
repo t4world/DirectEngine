@@ -29,6 +29,8 @@ private:
 	    //D3DXVECTOR4 color;
 		D3DXVECTOR2 texture;
 		D3DXVECTOR3 normal;
+		D3DXVECTOR3 tangent;
+		D3DXVECTOR3 binormal;
 	};
 
 	struct ModelType
@@ -41,6 +43,31 @@ private:
 		float nx;
 		float ny;
 		float nz;
+		float tx;
+		float ty;
+		float tz;
+		float bx;
+		float by;
+		float bz;
+	};
+
+	struct TempVertexType
+	{
+		float x;
+		float y;
+		float z;
+		float tx;
+		float ty;
+		float nx;
+		float ny;
+		float nz;
+	};
+
+	struct VertorType
+	{
+		float x;
+		float y;
+		float z;
 	};
 
 public:
@@ -65,6 +92,10 @@ private:
 
 	bool LoadModel(char *modelFile);
 	void ReleaseModel();
+
+	void CalculateModelVectors();
+	void CalculateTangentBinormal(TempVertexType vertex_0, TempVertexType vertex_1, TempVertexType vertex_2, VertorType &tangent,VertorType &binormal);
+	void CalculateNormal(VertorType tangent, VertorType binormal, VertorType &normal);
 
 private:
 	ID3D11Buffer *m_vertexBuffer, *m_indexBuffer;
