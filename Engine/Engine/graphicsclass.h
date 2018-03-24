@@ -22,6 +22,7 @@
 #include "frustumclass.h"
 #include "modellistclass.h"
 #include "multitextureshaderclass.h"
+#include "bumpmapshaderclass.h"
 
 
 /////////////
@@ -57,13 +58,13 @@ private:
 	//ColorShaderClass* m_ColorShader;
 	//TextureShaderClass *m_TextureShader;
 	//LightShaderClass *m_LightShader;
-	//LightClass *m_Light;
+	LightClass *m_Light;
 	//BitmapClass *m_Bitmap;
 	//TextClass *m_Text;
 	//ModelListClass *m_ModelList;
 	//FrustumClass *m_Frustum;
-	MultiTextureShaderClass *m_MultiTextureShader;
-	
+	//MultiTextureShaderClass *m_MultiTextureShader;
+	BumpMapShaderClass *m_BumpMapShader;
 };
 
 #endif

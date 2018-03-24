@@ -29,7 +29,7 @@ float4 BumpMapPixelShader(PixelInputType input):SV_TARGET
 	bumpMap = shaderTexture[1].Sample(SampleType,input.tex);
 	bumpMap = (bumpMap * 2.0f) - 1.0f;
 	bumpNormal = (bumpMap.x * input.tangent) + (bumpMap.y * input.binormal) + (bumpMap.z * input.normal);
-	bumpNormal = normalize(bummNormal);
+	bumpNormal = normalize(bumpNormal);
 	lightDir = -lightDirection;
 	lightIntensity = saturate(dot(bumpNormal,lightDir));
 	color = saturate(diffuseColor * lightIntensity);

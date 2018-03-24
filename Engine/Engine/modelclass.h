@@ -56,14 +56,14 @@ private:
 		float x;
 		float y;
 		float z;
-		float tx;
-		float ty;
+		float tu;
+		float tv;
 		float nx;
 		float ny;
 		float nz;
 	};
 
-	struct VertorType
+	struct VectorType
 	{
 		float x;
 		float y;
@@ -94,8 +94,8 @@ private:
 	void ReleaseModel();
 
 	void CalculateModelVectors();
-	void CalculateTangentBinormal(TempVertexType vertex_0, TempVertexType vertex_1, TempVertexType vertex_2, VertorType &tangent,VertorType &binormal);
-	void CalculateNormal(VertorType tangent, VertorType binormal, VertorType &normal);
+	void CalculateTangentBinormal(TempVertexType vertex_0, TempVertexType vertex_1, TempVertexType vertex_2, VectorType &tangent,VectorType &binormal);
+	void CalculateNormal(VectorType tangent, VectorType binormal, VectorType &normal);
 
 private:
 	ID3D11Buffer *m_vertexBuffer, *m_indexBuffer;

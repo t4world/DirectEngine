@@ -12,12 +12,13 @@ GraphicsClass::GraphicsClass()
 	//m_ColorShader = 0;
 	//m_TextureShader = 0;
 	//m_LightShader = 0;
-	//m_Light = 0;
+	m_Light = 0;
 	//m_Bitmap = 0;
 	//m_Text = 0;
 	//m_ModelList = 0;
 	//m_Frustum = 0;
-	m_MultiTextureShader = 0;
+	//m_MultiTextureShader = 0;
+	m_BumpMapShader = 0;
 }
 
 
@@ -72,10 +73,22 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	}
 
 	// Initialize the model object.
-	result = m_Model->Initialize(m_D3D->GetDevice(),"../Engine/data/square.txt",L"../Engine/data/stone01.dds",L"../Engine/data/dirt01.dds");
+	result = m_Model->Initialize(m_D3D->GetDevice(),"../Engine/data/cube.txt",L"../Engine/data/stone01.dds",L"../Engine/data/bump01.dds");
 	if(!result)
 	{
 		MessageBox(hwnd, L"Could not initialize the model object.", L"Error", MB_OK);
+		return false;
+	}
+
+	m_BumpMapShader = new BumpMapShaderClass;
+	if (!m_BumpMapShader)
+	{
+		return false;
+	}
+	result = m_BumpMapShader->Initialize(m_D3D->GetDevice(), hwnd);
+	if (!result)
+	{
+		MessageBox(hwnd, L"Could not initialize the bump map shader object", L"Error", MB_OK);
 		return false;
 	}
 
@@ -117,11 +130,11 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 // 	}
 
 	//Create the light object
-// 	m_Light = new LightClass;
-// 	if (!m_Light)
-// 	{
-// 		return false;
-// 	}
+	m_Light = new LightClass;
+	if (!m_Light)
+	{
+		return false;
+	}
 // 	//Initialize the light objec15
 // 	m_Light->SetDirection(1.0f, 0.0f, 1.0f);
 // 	m_Light->SetAmbientColor(0.15f, 0.15f, 0.15f, 1.0f);
@@ -172,29 +185,44 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 // 		return false;
 // 	}
 
-	m_MultiTextureShader = new MultiTextureShaderClass;
-	if (!m_MultiTextureShader)
-	{
-		return false;
-	}
-	result = m_MultiTextureShader->Initialize(m_D3D->GetDevice(), hwnd);
-	if (!result)
-	{
-		MessageBox(hwnd, L"Could not initialize the mulittexture shader object", L"Error", MB_OK);
-		return false;
-	}
+// 	m_MultiTextureShader = new MultiTextureShaderClass;
+// 	if (!m_MultiTextureShader)
+// 	{
+// 		return false;
+// 	}
+// 	result = m_MultiTextureShader->Initialize(m_D3D->GetDevice(), hwnd);
+// 	if (!result)
+// 	{
+// 		MessageBox(hwnd, L"Could not initialize the mulittexture shader object", L"Error", MB_OK);
+// 		return false;
+// 	}
+
+	m_Light->SetDiffuseColor(1.0f, 1.0f, 1.0f, 1.0f);
+	m_Light->SetDirection(0.0f, 0.0f, 1.0f);
 	return true;
 }
 
 
 void GraphicsClass::Shutdown()
 {
-	if (m_MultiTextureShader)
+	if (m_Light)
 	{
-		m_MultiTextureShader->Shutdown();
-		delete m_MultiTextureShader;
-		m_MultiTextureShader = 0;
+		delete m_Light;
+		m_Light = 0;
 	}
+
+	if (m_BumpMapShader)
+	{
+		m_BumpMapShader->Shutdown();
+		delete m_BumpMapShader;
+		m_BumpMapShader = 0;
+	}
+// 	if (m_MultiTextureShader)
+// 	{
+// 		m_MultiTextureShader->Shutdown();
+// 		delete m_MultiTextureShader;
+// 		m_MultiTextureShader = 0;
+// 	}
 // 	if (m_Frustum)
 // 	{
 // 		delete m_Frustum;
@@ -305,6 +333,7 @@ bool GraphicsClass::Frame(float rotationY)
 bool GraphicsClass::Render()
 {
 	D3DXMATRIX worldMatrix, viewMatrix, projectionMatrix, orthoMatrix;
+	static float rotation = 0.0f;
 // 	int modelCount;
 // 	int renderCount;
 // 	int index;
@@ -328,6 +357,12 @@ bool GraphicsClass::Render()
 	m_D3D->GetWorldMatrix(worldMatrix);
 	m_D3D->GetProjectionMatrix(projectionMatrix);
 	m_D3D->GetOrthoMatrix(orthoMatrix);
+	rotation += (float)D3DX_PI * 0.0025f;
+	if (rotation > 360.0f)
+	{
+		rotation -= 360.0f;
+	}
+	D3DXMatrixRotationY(&worldMatrix, rotation);
 // 	m_Frustum->ConsturctFrustum(SCREEN_DEPTH, projectionMatrix, viewMatrix);
 // 	modelCount = m_ModelList->GetModelCount();
 // 	for (index = 0; index< modelCount;index++)
@@ -355,7 +390,8 @@ bool GraphicsClass::Render()
 	//D3DXMatrixRotationY(&worldMatrix, rotation);
 	// Put the model vertex and index buffers on the graphics pipeline to prepare them for drawing.
 	m_Model->Render(m_D3D->GetDeviceContext());
-	m_MultiTextureShader->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix, m_Model->GetTexture());
+	m_BumpMapShader->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix, m_Model->GetTexture(), m_Light->GetDirection(), m_Light->GetDiffuseColor());
+	//m_MultiTextureShader->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix, m_Model->GetTexture());
 	// Render the model using the color shader.
 	//result = m_ColorShader->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
 

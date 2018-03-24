@@ -102,7 +102,7 @@ bool BumpMapShaderClass::InitializeShader(ID3D11Device *device, HWND hwnd, WCHAR
 	{
 		return false;
 	}
-	result = device->CreatePixelShader(pixelShaderBuffer->GetBufferPointer(), vertexShaderBuffer->GetBufferSize(), NULL, &m_pixelShader);
+	result = device->CreatePixelShader(pixelShaderBuffer->GetBufferPointer(), pixelShaderBuffer->GetBufferSize(), NULL, &m_pixelShader);
 	if (FAILED(result))
 	{
 		return false;
@@ -283,6 +283,7 @@ bool BumpMapShaderClass::SetShaderParameters(ID3D11DeviceContext *deviceContext,
 
 	bufferNumber = 0;
 	deviceContext->VSSetConstantBuffers(bufferNumber, 1, &m_matrixBuffer);
+	deviceContext->PSSetShaderResources(0, 2, texture);
 	result = deviceContext->Map(m_lightBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 	if (FAILED(result))
 	{
@@ -304,4 +305,5 @@ bool BumpMapShaderClass::RenderShader(ID3D11DeviceContext *deviceContext, int in
 	deviceContext->PSSetShader(m_pixelShader, NULL, 0);
 	deviceContext->PSSetSamplers(0, 1, &m_sampleState);
 	deviceContext->DrawIndexed(indexCount, 0, 0);
+	return true;
 }
