@@ -29,7 +29,7 @@ struct PixelInputType
 	float3 viewDirection:TEXCOORD1;
 };
 
-PixelInputType SpecMapVertexShader(VertexInput input)
+PixelInputType SpecMapVertexShader(VertexInputType input)
 {
 	PixelInputType output;
 	float4 worldPos;
@@ -45,7 +45,7 @@ PixelInputType SpecMapVertexShader(VertexInput input)
 	output.binormal = mul(input.binormal,(float3x3)worldMatrix);
 	output.binormal = normalize(output.binormal);
 	worldPos = mul(input.position,worldMatrix);
-	output.viewDirection = cameraPosition.xyz - worldPosition.xyz;
+	output.viewDirection = cameraPosition.xyz - worldPos.xyz;
 	output.viewDirection = normalize(output.viewDirection);
 	return output;
 }

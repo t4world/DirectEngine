@@ -18,7 +18,7 @@ struct PixelInputType
 	float3 viewDirection:TEXCOORD1;
 };
 
-float4 SpecPixelShader(PixelInputType input):SV_TARGET
+float4 SpecMapPixelShader(PixelInputType input):SV_TARGET
 {
 	float4 textureColor;
 	float4 bumpMap;
