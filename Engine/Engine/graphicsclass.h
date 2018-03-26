@@ -23,6 +23,7 @@
 #include "modellistclass.h"
 #include "multitextureshaderclass.h"
 #include "bumpmapshaderclass.h"
+#include "specmapshaderclass.h"
 
 
 /////////////
@@ -64,7 +65,8 @@ private:
 	//ModelListClass *m_ModelList;
 	//FrustumClass *m_Frustum;
 	//MultiTextureShaderClass *m_MultiTextureShader;
-	BumpMapShaderClass *m_BumpMapShader;
+	//BumpMapShaderClass *m_BumpMapShader;
+	SpecMapShaderClass* m_SpecMapShader;
 };
 
 #endif

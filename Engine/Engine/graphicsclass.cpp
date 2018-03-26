@@ -18,7 +18,8 @@ GraphicsClass::GraphicsClass()
 	//m_ModelList = 0;
 	//m_Frustum = 0;
 	//m_MultiTextureShader = 0;
-	m_BumpMapShader = 0;
+	//m_BumpMapShader = 0;
+	m_SpecMapShader = 0;
 }
 
 
@@ -80,17 +81,17 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 		return false;
 	}
 
-	m_BumpMapShader = new BumpMapShaderClass;
-	if (!m_BumpMapShader)
-	{
-		return false;
-	}
-	result = m_BumpMapShader->Initialize(m_D3D->GetDevice(), hwnd);
-	if (!result)
-	{
-		MessageBox(hwnd, L"Could not initialize the bump map shader object", L"Error", MB_OK);
-		return false;
-	}
+// 	m_BumpMapShader = new BumpMapShaderClass;
+// 	if (!m_BumpMapShader)
+// 	{
+// 		return false;
+// 	}
+// 	result = m_BumpMapShader->Initialize(m_D3D->GetDevice(), hwnd);
+// 	if (!result)
+// 	{
+// 		MessageBox(hwnd, L"Could not initialize the bump map shader object", L"Error", MB_OK);
+// 		return false;
+// 	}
 
 	// Create the color shader object.
 // 	m_ColorShader = new ColorShaderClass;
@@ -129,6 +130,20 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 // 		return false;
 // 	}
 
+// Create the specular map shader object.
+	m_SpecMapShader = new SpecMapShaderClass;
+	if (!m_SpecMapShader)
+	{
+		return false;
+	}
+
+	// Initialize the specular map shader object.
+	result = m_SpecMapShader->Initialize(m_D3D->GetDevice(), hwnd);
+	if (!result)
+	{
+		MessageBox(hwnd, L"Could not initialize the specular map shader object.", L"Error", MB_OK);
+		return false;
+	}
 	//Create the light object
 	m_Light = new LightClass;
 	if (!m_Light)
@@ -199,6 +214,8 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 
 	m_Light->SetDiffuseColor(1.0f, 1.0f, 1.0f, 1.0f);
 	m_Light->SetDirection(0.0f, 0.0f, 1.0f);
+	m_Light->SetSpecularColor(1.0f, 1.0f, 1.0f, 1.0f);
+	m_Light->SetSpecularPower(16.0f);
 	return true;
 }
 
@@ -211,12 +228,19 @@ void GraphicsClass::Shutdown()
 		m_Light = 0;
 	}
 
-	if (m_BumpMapShader)
+	if (m_SpecMapShader)
 	{
-		m_BumpMapShader->Shutdown();
-		delete m_BumpMapShader;
-		m_BumpMapShader = 0;
+		m_SpecMapShader->Shutdown();
+		delete m_SpecMapShader;
+		m_SpecMapShader = 0;
 	}
+
+// 	if (m_BumpMapShader)
+// 	{
+// 		m_BumpMapShader->Shutdown();
+// 		delete m_BumpMapShader;
+// 		m_BumpMapShader = 0;
+// 	}
 // 	if (m_MultiTextureShader)
 // 	{
 // 		m_MultiTextureShader->Shutdown();
@@ -390,7 +414,10 @@ bool GraphicsClass::Render()
 	//D3DXMatrixRotationY(&worldMatrix, rotation);
 	// Put the model vertex and index buffers on the graphics pipeline to prepare them for drawing.
 	m_Model->Render(m_D3D->GetDeviceContext());
-	m_BumpMapShader->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix, m_Model->GetTexture(), m_Light->GetDirection(), m_Light->GetDiffuseColor());
+	m_SpecMapShader->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix,
+		m_Model->GetTexture(), m_Light->GetDirection(), m_Light->GetDiffuseColor(),
+		m_Camera->GetPosition(), m_Light->GetSpecularColor(), m_Light->GetSpecularPower());
+	//m_BumpMapShader->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix, m_Model->GetTexture(), m_Light->GetDirection(), m_Light->GetDiffuseColor());
 	//m_MultiTextureShader->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix, m_Model->GetTexture());
 	// Render the model using the color shader.
 	//result = m_ColorShader->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
