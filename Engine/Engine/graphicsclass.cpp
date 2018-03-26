@@ -74,7 +74,7 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	}
 
 	// Initialize the model object.
-	result = m_Model->Initialize(m_D3D->GetDevice(),"../Engine/data/cube.txt",L"../Engine/data/stone01.dds",L"../Engine/data/bump01.dds");
+	result = m_Model->Initialize(m_D3D->GetDevice(), "../Engine/data/cube.txt", L"../Engine/data/stone02.dds", L"../Engine/data/bump02.dds",L"../Engine/data/spec02.dds");
 	if(!result)
 	{
 		MessageBox(hwnd, L"Could not initialize the model object.", L"Error", MB_OK);
