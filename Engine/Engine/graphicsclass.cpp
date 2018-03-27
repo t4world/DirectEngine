@@ -410,7 +410,7 @@ bool GraphicsClass::Render()
 // 	D3DXVECTOR4 color;
  	bool result;
 // 	bool renderModel;
-
+	//The first pass of our render is to a texture now.
 	result = RenderToTexture();
 	if (!result)
 	{
@@ -418,13 +418,14 @@ bool GraphicsClass::Render()
 	}
 
 	// Clear the buffers to begin the scene.
+	//The second pass of our render is to the back buffer as normal.
 	m_D3D->BeginScene(0.0f, 0.0f, 0.0f, 1.0f);
 	result = RenderScene();
 	if (!result)
 	{
 		return false;
 	}
-
+	//Then after the rendering is complete we render the 2D debug window so we can see the render to texture as a 2D image at the 50x50 pixel location.
 	m_D3D->TurnZBufferOff();
 	
 
@@ -524,7 +525,9 @@ bool GraphicsClass::Render()
 bool GraphicsClass::RenderToTexture()
 {
 	bool result;
+	// Set the render target to be the render to texture.
 	m_RenderTexture->SetRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView());
+	//Clear the render to texture background to blue so we can differentiate it from the rest of the normal scene.
 	m_RenderTexture->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(), 0.0f, 0.0f, 1.0f, 1.0f);
 	// Render the scene now and it will draw to the render to texture instead of the back buffer.
 	result = RenderScene();
