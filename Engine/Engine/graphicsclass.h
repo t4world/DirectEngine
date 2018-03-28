@@ -11,6 +11,7 @@
 #include "d3dclass.h"
 #include "cameraclass.h"
 #include "modelclass.h"
+#include "modelclass1.h"
 
 //#include "colorshaderclass.h"
 #include "textureshaderclass.h"
@@ -26,6 +27,7 @@
 #include "specmapshaderclass.h"
 #include "rendertextureclass.h"
 #include "debugwindowclass.h"
+#include "fogshaderclass.h"
 
 
 /////////////
@@ -59,20 +61,22 @@ private:
 private:
 	D3DClass* m_D3D;
 	CameraClass* m_Camera;
-	ModelClass* m_Model;
+	//ModelClass* m_Model;
 	//ColorShaderClass* m_ColorShader;
-	TextureShaderClass *m_TextureShader;
+	//TextureShaderClass *m_TextureShader;
 	//LightShaderClass *m_LightShader;
-	LightClass *m_Light;
+	//LightClass *m_Light;
 	//BitmapClass *m_Bitmap;
 	//TextClass *m_Text;
 	//ModelListClass *m_ModelList;
 	//FrustumClass *m_Frustum;
 	//MultiTextureShaderClass *m_MultiTextureShader;
 	//BumpMapShaderClass *m_BumpMapShader;
-	SpecMapShaderClass* m_SpecMapShader;
-	RenderTextureClass *m_RenderTexture;
-	DebugWindowClass *m_DebuWindow;
+	//SpecMapShaderClass* m_SpecMapShader;
+	//RenderTextureClass *m_RenderTexture;
+	//DebugWindowClass *m_DebuWindow;
+	ModelClass1 *m_Model1;
+	FogShaderClass *m_FogShader;
 };
 
 #endif
