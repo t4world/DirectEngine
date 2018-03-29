@@ -28,6 +28,7 @@
 #include "rendertextureclass.h"
 #include "debugwindowclass.h"
 #include "fogshaderclass.h"
+#include "clipplaneshaderclass.h"
 
 
 /////////////
@@ -76,7 +77,8 @@ private:
 	//RenderTextureClass *m_RenderTexture;
 	//DebugWindowClass *m_DebuWindow;
 	ModelClass1 *m_Model1;
-	FogShaderClass *m_FogShader;
+	//FogShaderClass *m_FogShader;
+	ClipPlaneShaderClass *m_clipShader;
 };
 
 #endif

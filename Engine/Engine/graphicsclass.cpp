@@ -24,7 +24,8 @@ GraphicsClass::GraphicsClass()
 	//m_DebuWindow = 0;
 	//m_TextureShader = 0;
 	m_Model1 = 0;
-	m_FogShader = 0;
+	//m_FogShader = 0;
+	m_clipShader = 0;
 }
 
 
@@ -152,14 +153,33 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 // 		return false;
 // 	}
 
-	m_FogShader = new FogShaderClass;
-	if (!m_FogShader)
+// 	m_FogShader = new FogShaderClass;
+// 	if (!m_FogShader)
+// 	{
+// 		return false;
+// 	}
+
+	// Initialize the specular map shader object.
+// 	result = m_FogShader->Initialize(m_D3D->GetDevice(), hwnd);
+// 	if (!result)
+// 	{
+// 		MessageBox(hwnd, L"Could not initialize the specular map shader object.", L"Error", MB_OK);
+// 		return false;
+// 	}
+// 
+// 	m_FogShader = new FogShaderClass;
+// 	if (!m_FogShader)
+// 	{
+// 		return false;
+// 	}
+
+	// Initialize the specular map shader object.
+	m_clipShader = new ClipPlaneShaderClass;
+	if (!m_clipShader)
 	{
 		return false;
 	}
-
-	// Initialize the specular map shader object.
-	result = m_FogShader->Initialize(m_D3D->GetDevice(), hwnd);
+	result = m_clipShader->Initialize(m_D3D->GetDevice(), hwnd);
 	if (!result)
 	{
 		MessageBox(hwnd, L"Could not initialize the specular map shader object.", L"Error", MB_OK);
@@ -281,11 +301,18 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 
 void GraphicsClass::Shutdown()
 {
-	if (m_FogShader)
+// 	if (m_FogShader)
+// 	{
+// 		m_FogShader->Shutdown();
+// 		delete m_FogShader;
+// 		m_FogShader = 0;
+// 	}
+
+	if (m_clipShader)
 	{
-		m_FogShader->Shutdown();
-		delete m_FogShader;
-		m_FogShader = 0;
+		m_clipShader->Shutdown();
+		delete m_clipShader;
+		m_clipShader = 0;
 	}
 
 	//Release the texture shader object
@@ -452,6 +479,8 @@ bool GraphicsClass::Render()
 // 	float positionZ;
 // 	float radius;
 	D3DXVECTOR4 fogColor = D3DXVECTOR4(0.5f, 0.5f, 0.5f, 1.0f);
+	D3DXVECTOR4 clipPlane = D3DXVECTOR4(0.5f, 1.0f, 0.0f, 0.0f);
+
 
 
  	bool result;
@@ -502,8 +531,10 @@ bool GraphicsClass::Render()
 	D3DXMatrixRotationY(&worldMatrix, rotation);
 
 	m_Model1->Render(m_D3D->GetDeviceContext());
-	m_FogShader->Render(m_D3D->GetDeviceContext(), m_Model1->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix,
-		m_Model1->GetTexture(),fogColor,0.0f,10.0f);
+// 	m_FogShader->Render(m_D3D->GetDeviceContext(), m_Model1->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix,
+// 		m_Model1->GetTexture(),fogColor,0.0f,10.0f);
+	m_clipShader->Render(m_D3D->GetDeviceContext(), m_Model1->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix,
+		m_Model1->GetTexture(), clipPlane);
 // 	m_Frustum->ConsturctFrustum(SCREEN_DEPTH, projectionMatrix, viewMatrix);
 // 	modelCount = m_ModelList->GetModelCount();
 // 	for (index = 0; index< modelCount;index++)
