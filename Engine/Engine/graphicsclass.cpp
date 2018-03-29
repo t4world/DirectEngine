@@ -22,10 +22,12 @@ GraphicsClass::GraphicsClass()
 	//m_SpecMapShader = 0;
 	//m_RenderTexture = 0;
 	//m_DebuWindow = 0;
-	//m_TextureShader = 0;
+	m_TextureShader = 0;
 	m_Model1 = 0;
+	m_Model2 = 0;
 	//m_FogShader = 0;
-	m_clipShader = 0;
+	//m_clipShader = 0;
+	m_transparentShader = 0;
 }
 
 
@@ -94,7 +96,21 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	}
 
 	// Initialize the model object.
-	result = m_Model1->Initialize(m_D3D->GetDevice(), "../Engine/data/cube.txt", L"../Engine/data/seafloor.dds");
+	result = m_Model1->Initialize(m_D3D->GetDevice(), "../Engine/data/cube.txt", L"../Engine/data/dirt01.dds");
+	if (!result)
+	{
+		MessageBox(hwnd, L"Could not initialize the model object.", L"Error", MB_OK);
+		return false;
+	}
+
+	m_Model2 = new ModelClass1;
+	if (!m_Model2)
+	{
+		return false;
+	}
+
+	// Initialize the model object.
+	result = m_Model2->Initialize(m_D3D->GetDevice(), "../Engine/data/cube.txt", L"../Engine/data/stone01.dds");
 	if (!result)
 	{
 		MessageBox(hwnd, L"Could not initialize the model object.", L"Error", MB_OK);
@@ -174,12 +190,24 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 // 	}
 
 	// Initialize the specular map shader object.
-	m_clipShader = new ClipPlaneShaderClass;
-	if (!m_clipShader)
+// 	m_clipShader = new ClipPlaneShaderClass;
+// 	if (!m_clipShader)
+// 	{
+// 		return false;
+// 	}
+// 	result = m_clipShader->Initialize(m_D3D->GetDevice(), hwnd);
+// 	if (!result)
+// 	{
+// 		MessageBox(hwnd, L"Could not initialize the specular map shader object.", L"Error", MB_OK);
+// 		return false;
+// 	}
+
+	m_transparentShader = new TransparentShaderClass;
+	if (!m_transparentShader)
 	{
 		return false;
 	}
-	result = m_clipShader->Initialize(m_D3D->GetDevice(), hwnd);
+	result = m_transparentShader->Initialize(m_D3D->GetDevice(), hwnd);
 	if (!result)
 	{
 		MessageBox(hwnd, L"Could not initialize the specular map shader object.", L"Error", MB_OK);
@@ -282,18 +310,18 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 // 	}
 
 	//Create the texture shader object
-// 	m_TextureShader = new TextureShaderClass;
-// 	if (!m_TextureShader)
-// 	{
-// 	 	return false;
-// 	}
-// 	//Initialzie the texture shader object.
-// 	result = m_TextureShader->Initialize(m_D3D->GetDevice(), hwnd);
-// 	if(!result)
-// 	{
-// 	 	MessageBox(hwnd, L"Could not initialize the texture  shader object.", L"Error", MB_OK);
-// 	 	return false;
-// 	}
+	m_TextureShader = new TextureShaderClass;
+	if (!m_TextureShader)
+	{
+	 	return false;
+	}
+	//Initialzie the texture shader object.
+	result = m_TextureShader->Initialize(m_D3D->GetDevice(), hwnd);
+	if(!result)
+	{
+	 	MessageBox(hwnd, L"Could not initialize the texture  shader object.", L"Error", MB_OK);
+	 	return false;
+	}
 
 	return true;
 }
@@ -307,21 +335,27 @@ void GraphicsClass::Shutdown()
 // 		delete m_FogShader;
 // 		m_FogShader = 0;
 // 	}
-
-	if (m_clipShader)
+	if (m_transparentShader)
 	{
-		m_clipShader->Shutdown();
-		delete m_clipShader;
-		m_clipShader = 0;
+		m_transparentShader->Shutdown();
+		delete m_transparentShader;
+		m_transparentShader = 0;
 	}
 
-	//Release the texture shader object
-// 	if (m_TextureShader)
+// 	if (m_clipShader)
 // 	{
-// 		m_TextureShader->Shutdown();
-// 		delete m_TextureShader;
-// 		m_TextureShader = 0;
+// 		m_clipShader->Shutdown();
+// 		delete m_clipShader;
+// 		m_clipShader = 0;
 // 	}
+
+	//Release the texture shader object
+	if (m_TextureShader)
+	{
+		m_TextureShader->Shutdown();
+		delete m_TextureShader;
+		m_TextureShader = 0;
+	}
 // 
 // 	if (m_RenderTexture)
 // 	{
@@ -415,6 +449,13 @@ void GraphicsClass::Shutdown()
 	 	m_Model1 = 0;
 	}
 
+	if (m_Model2)
+	{
+		m_Model2->Shutdown();
+		delete m_Model2;
+		m_Model2 = 0;
+	}
+
 
 	//Release the text object;
 // 	if (m_Text)
@@ -480,6 +521,7 @@ bool GraphicsClass::Render()
 // 	float radius;
 	D3DXVECTOR4 fogColor = D3DXVECTOR4(0.5f, 0.5f, 0.5f, 1.0f);
 	D3DXVECTOR4 clipPlane = D3DXVECTOR4(0.5f, 1.0f, 0.0f, 0.0f);
+	float alpha = 0.5f;
 
 
 
@@ -531,10 +573,25 @@ bool GraphicsClass::Render()
 	D3DXMatrixRotationY(&worldMatrix, rotation);
 
 	m_Model1->Render(m_D3D->GetDeviceContext());
+	result = m_TextureShader->Render(m_D3D->GetDeviceContext(), m_Model1->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix, m_Model1->GetTexture());
+	if (!result)
+	{
+		return false;
+	}
+	D3DXMatrixTranslation(&worldMatrix, 1.0f, 0.0f, -1.0f);
+	m_D3D->TurnOnAlphaBlending();
+	m_Model2->Render(m_D3D->GetDeviceContext());
 // 	m_FogShader->Render(m_D3D->GetDeviceContext(), m_Model1->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix,
 // 		m_Model1->GetTexture(),fogColor,0.0f,10.0f);
-	m_clipShader->Render(m_D3D->GetDeviceContext(), m_Model1->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix,
-		m_Model1->GetTexture(), clipPlane);
+// 	m_clipShader->Render(m_D3D->GetDeviceContext(), m_Model1->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix,
+// 		m_Model1->GetTexture(), clipPlane);
+	result = m_transparentShader->Render(m_D3D->GetDeviceContext(), m_Model2->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix,
+		m_Model2->GetTexture(), alpha);
+	if (!result)
+	{
+		return false;
+	}
+	m_D3D->TurnOffAlphaBlending();
 // 	m_Frustum->ConsturctFrustum(SCREEN_DEPTH, projectionMatrix, viewMatrix);
 // 	modelCount = m_ModelList->GetModelCount();
 // 	for (index = 0; index< modelCount;index++)
@@ -583,11 +640,7 @@ bool GraphicsClass::Render()
 // 		return false;
 // 	}
 // 	//Render the bitmap with the texture shader.
-// 	result = m_TextureShader->Render(m_D3D->GetDeviceContext(), m_Bitmap->GetIndexCount(), worldMatrix, viewMatrix, orthoMatrix, m_Bitmap->GetTexture());
-// 	if (!result)
-// 	{
-// 		return false;
-// 	}
+
 // 	m_D3D->TurnOnAlphaBlending();
 // 	result = m_Text->Render(m_D3D->GetDeviceContext(), worldMatrix, orthoMatrix);
 // 	if (!result)

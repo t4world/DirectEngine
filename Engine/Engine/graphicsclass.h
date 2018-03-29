@@ -29,6 +29,7 @@
 #include "debugwindowclass.h"
 #include "fogshaderclass.h"
 #include "clipplaneshaderclass.h"
+#include "transparentshaderClass.h"
 
 
 /////////////
@@ -64,7 +65,7 @@ private:
 	CameraClass* m_Camera;
 	//ModelClass* m_Model;
 	//ColorShaderClass* m_ColorShader;
-	//TextureShaderClass *m_TextureShader;
+	TextureShaderClass *m_TextureShader;
 	//LightShaderClass *m_LightShader;
 	//LightClass *m_Light;
 	//BitmapClass *m_Bitmap;
@@ -77,8 +78,10 @@ private:
 	//RenderTextureClass *m_RenderTexture;
 	//DebugWindowClass *m_DebuWindow;
 	ModelClass1 *m_Model1;
+	ModelClass1 *m_Model2;
 	//FogShaderClass *m_FogShader;
-	ClipPlaneShaderClass *m_clipShader;
+	//ClipPlaneShaderClass *m_clipShader;
+	TransparentShaderClass *m_transparentShader;
 };
 
 #endif
