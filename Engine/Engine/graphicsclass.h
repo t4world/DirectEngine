@@ -30,6 +30,7 @@
 #include "fogshaderclass.h"
 #include "clipplaneshaderclass.h"
 #include "transparentshaderClass.h"
+#include "reflectionshaderclass.h"
 
 
 /////////////
@@ -75,13 +76,15 @@ private:
 	//MultiTextureShaderClass *m_MultiTextureShader;
 	//BumpMapShaderClass *m_BumpMapShader;
 	//SpecMapShaderClass* m_SpecMapShader;
-	//RenderTextureClass *m_RenderTexture;
+	RenderTextureClass *m_RenderTexture;
 	//DebugWindowClass *m_DebuWindow;
 	ModelClass1 *m_Model1;
-	ModelClass1 *m_Model2;
+	ModelClass1 *m_FloorModel;
+	//ModelClass1 *m_Model2;
 	//FogShaderClass *m_FogShader;
 	//ClipPlaneShaderClass *m_clipShader;
-	TransparentShaderClass *m_transparentShader;
+	//TransparentShaderClass *m_transparentShader;
+	ReflectionShaderClass *m_ReflectionShader;
 };
 
 #endif

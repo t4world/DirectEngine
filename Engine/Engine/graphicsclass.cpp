@@ -20,14 +20,16 @@ GraphicsClass::GraphicsClass()
 	//m_MultiTextureShader = 0;
 	//m_BumpMapShader = 0;
 	//m_SpecMapShader = 0;
-	//m_RenderTexture = 0;
+	m_RenderTexture = 0;
 	//m_DebuWindow = 0;
 	m_TextureShader = 0;
 	m_Model1 = 0;
-	m_Model2 = 0;
+	//m_Model2 = 0;
 	//m_FogShader = 0;
 	//m_clipShader = 0;
-	m_transparentShader = 0;
+	//m_transparentShader = 0;
+	m_FloorModel = 0;
+	m_ReflectionShader = 0;
 }
 
 
@@ -96,26 +98,26 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	}
 
 	// Initialize the model object.
-	result = m_Model1->Initialize(m_D3D->GetDevice(), "../Engine/data/cube.txt", L"../Engine/data/dirt01.dds");
+	result = m_Model1->Initialize(m_D3D->GetDevice(), "../Engine/data/cube.txt", L"../Engine/data/seafloor.dds");
 	if (!result)
 	{
 		MessageBox(hwnd, L"Could not initialize the model object.", L"Error", MB_OK);
 		return false;
 	}
 
-	m_Model2 = new ModelClass1;
-	if (!m_Model2)
-	{
-		return false;
-	}
-
-	// Initialize the model object.
-	result = m_Model2->Initialize(m_D3D->GetDevice(), "../Engine/data/cube.txt", L"../Engine/data/stone01.dds");
-	if (!result)
-	{
-		MessageBox(hwnd, L"Could not initialize the model object.", L"Error", MB_OK);
-		return false;
-	}
+// 	m_Model2 = new ModelClass1;
+// 	if (!m_Model2)
+// 	{
+// 		return false;
+// 	}
+// 
+// 	// Initialize the model object.
+// 	result = m_Model2->Initialize(m_D3D->GetDevice(), "../Engine/data/cube.txt", L"../Engine/data/stone01.dds");
+// 	if (!result)
+// 	{
+// 		MessageBox(hwnd, L"Could not initialize the model object.", L"Error", MB_OK);
+// 		return false;
+// 	}
 
 // 	m_BumpMapShader = new BumpMapShaderClass;
 // 	if (!m_BumpMapShader)
@@ -202,17 +204,17 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 // 		return false;
 // 	}
 
-	m_transparentShader = new TransparentShaderClass;
-	if (!m_transparentShader)
-	{
-		return false;
-	}
-	result = m_transparentShader->Initialize(m_D3D->GetDevice(), hwnd);
-	if (!result)
-	{
-		MessageBox(hwnd, L"Could not initialize the specular map shader object.", L"Error", MB_OK);
-		return false;
-	}
+// 	m_transparentShader = new TransparentShaderClass;
+// 	if (!m_transparentShader)
+// 	{
+// 		return false;
+// 	}
+// 	result = m_transparentShader->Initialize(m_D3D->GetDevice(), hwnd);
+// 	if (!result)
+// 	{
+// 		MessageBox(hwnd, L"Could not initialize the specular map shader object.", L"Error", MB_OK);
+// 		return false;
+// 	}
 	//Create the light object
 // 	m_Light = new LightClass;
 // 	if (!m_Light)
@@ -287,15 +289,29 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 // 	m_Light->SetSpecularPower(16.0f);
 // 
 // 	m_RenderTexture = new RenderTextureClass;
-// 	if (!m_RenderTexture)
-// 	{
-// 		return false;
-// 	}
-// 	result = m_RenderTexture->Initialize(m_D3D->GetDevice(), screenWidth, screenHeight);
-// 	if (!result)
-// 	{
-// 		return false;
-// 	}
+	if (!m_RenderTexture)
+	{
+		return false;
+	}
+	result = m_RenderTexture->Initialize(m_D3D->GetDevice(), screenWidth, screenHeight);
+	if (!result)
+	{
+		return false;
+	}
+
+	m_FloorModel = new ModelClass1;
+	if (!m_FloorModel)
+	{
+	 	return false;
+	}
+	 
+	// Initialize the model object.
+	result = m_FloorModel->Initialize(m_D3D->GetDevice(), "../Engine/data/floor.txt", L"../Engine/data/blue01.dds");
+	if (!result)
+	{
+	 	MessageBox(hwnd, L"Could not initialize the model object.", L"Error", MB_OK);
+	 	return false;
+	}
 // 
 // 	m_DebuWindow = new DebugWindowClass;
 // 	if (!m_DebuWindow)
@@ -323,6 +339,19 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	 	return false;
 	}
 
+	m_ReflectionShader = new ReflectionShaderClass;
+	if (!m_ReflectionShader)
+	{
+		return false;
+	}
+	//Initialzie the texture shader object.
+	result = m_ReflectionShader->Initialize(m_D3D->GetDevice(), hwnd);
+	if (!result)
+	{
+		MessageBox(hwnd, L"Could not initialize the texture  shader object.", L"Error", MB_OK);
+		return false;
+	}
+
 	return true;
 }
 
@@ -335,11 +364,18 @@ void GraphicsClass::Shutdown()
 // 		delete m_FogShader;
 // 		m_FogShader = 0;
 // 	}
-	if (m_transparentShader)
+// 	if (m_transparentShader)
+// 	{
+// 		m_transparentShader->Shutdown();
+// 		delete m_transparentShader;
+// 		m_transparentShader = 0;
+// 	}
+
+	if (m_ReflectionShader)
 	{
-		m_transparentShader->Shutdown();
-		delete m_transparentShader;
-		m_transparentShader = 0;
+		m_ReflectionShader->Shutdown();
+		delete m_ReflectionShader;
+		m_ReflectionShader = 0;
 	}
 
 // 	if (m_clipShader)
@@ -355,6 +391,12 @@ void GraphicsClass::Shutdown()
 		m_TextureShader->Shutdown();
 		delete m_TextureShader;
 		m_TextureShader = 0;
+	}
+	if (m_FloorModel)
+	{
+		m_FloorModel->Shutdown();
+		delete m_FloorModel;
+		m_FloorModel = 0;
 	}
 // 
 // 	if (m_RenderTexture)
@@ -449,12 +491,12 @@ void GraphicsClass::Shutdown()
 	 	m_Model1 = 0;
 	}
 
-	if (m_Model2)
-	{
-		m_Model2->Shutdown();
-		delete m_Model2;
-		m_Model2 = 0;
-	}
+// 	if (m_Model2)
+// 	{
+// 		m_Model2->Shutdown();
+// 		delete m_Model2;
+// 		m_Model2 = 0;
+// 	}
 
 
 	//Release the text object;
@@ -528,33 +570,33 @@ bool GraphicsClass::Render()
  	bool result;
 // 	bool renderModel;
 	//The first pass of our render is to a texture now.
-// 	result = RenderToTexture();
-// 	if (!result)
-// 	{
-// 		return false;
-// 	}
+ 	result = RenderToTexture();
+	if (!result)
+	{
+		return false;
+	}
 
 	// Clear the buffers to begin the scene.
 	//The second pass of our render is to the back buffer as normal.
 	m_D3D->BeginScene(0.0f, 0.0f, 0.0f, 1.0f);
-// 	result = RenderScene();
-// 	if (!result)
-// 	{
-// 		return false;
-// 	}
+	//result = RenderScene();
+	if (!result)
+	{
+		return false;
+	}
 	//Then after the rendering is complete we render the 2D debug window so we can see the render to texture as a 2D image at the 50x50 pixel location.
 	//m_D3D->TurnZBufferOff();
 	
 
 //	renderCount = 0;
 	// Generate the view matrix based on the camera's position.
-	m_Camera->Render();
+	//m_Camera->Render();
 
 	// Get the world, view, and projection matrices from the camera and d3d objects.
-	m_Camera->GetViewMatrix(viewMatrix);
-	m_D3D->GetWorldMatrix(worldMatrix);
-	m_D3D->GetProjectionMatrix(projectionMatrix);
-	m_D3D->GetOrthoMatrix(orthoMatrix);
+// 	m_Camera->GetViewMatrix(viewMatrix);
+// 	m_D3D->GetWorldMatrix(worldMatrix);
+// 	m_D3D->GetProjectionMatrix(projectionMatrix);
+// 	m_D3D->GetOrthoMatrix(orthoMatrix);
 // 	result = m_DebuWindow->Render(m_D3D->GetDeviceContext(), 50, 50);
 // 	if (!result)
 // 	{
@@ -565,33 +607,33 @@ bool GraphicsClass::Render()
 // 	{
 // 		return false;
 // 	}
-	rotation += (float)D3DX_PI * 0.0025f;
-	if (rotation > 360.0f)
-	{
-		rotation -= 360.0f;
-	}
-	D3DXMatrixRotationY(&worldMatrix, rotation);
-
-	m_Model1->Render(m_D3D->GetDeviceContext());
-	result = m_TextureShader->Render(m_D3D->GetDeviceContext(), m_Model1->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix, m_Model1->GetTexture());
-	if (!result)
-	{
-		return false;
-	}
-	D3DXMatrixTranslation(&worldMatrix, 1.0f, 0.0f, -1.0f);
-	m_D3D->TurnOnAlphaBlending();
-	m_Model2->Render(m_D3D->GetDeviceContext());
+// 	rotation += (float)D3DX_PI * 0.0025f;
+// 	if (rotation > 360.0f)
+// 	{
+// 		rotation -= 360.0f;
+// 	}
+// 	D3DXMatrixRotationY(&worldMatrix, rotation);
+// 
+// 	m_Model1->Render(m_D3D->GetDeviceContext());
+// 	result = m_TextureShader->Render(m_D3D->GetDeviceContext(), m_Model1->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix, m_Model1->GetTexture());
+// 	if (!result)
+// 	{
+// 		return false;
+// 	}
+// 	D3DXMatrixTranslation(&worldMatrix, 1.0f, 0.0f, -1.0f);
+// 	m_D3D->TurnOnAlphaBlending();
+// 	m_Model2->Render(m_D3D->GetDeviceContext());
 // 	m_FogShader->Render(m_D3D->GetDeviceContext(), m_Model1->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix,
 // 		m_Model1->GetTexture(),fogColor,0.0f,10.0f);
 // 	m_clipShader->Render(m_D3D->GetDeviceContext(), m_Model1->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix,
 // 		m_Model1->GetTexture(), clipPlane);
-	result = m_transparentShader->Render(m_D3D->GetDeviceContext(), m_Model2->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix,
-		m_Model2->GetTexture(), alpha);
-	if (!result)
-	{
-		return false;
-	}
-	m_D3D->TurnOffAlphaBlending();
+// 	result = m_transparentShader->Render(m_D3D->GetDeviceContext(), m_Model2->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix,
+// 		m_Model2->GetTexture(), alpha);
+// 	if (!result)
+// 	{
+// 		return false;
+// 	}
+// 	m_D3D->TurnOffAlphaBlending();
 // 	m_Frustum->ConsturctFrustum(SCREEN_DEPTH, projectionMatrix, viewMatrix);
 // 	modelCount = m_ModelList->GetModelCount();
 // 	for (index = 0; index< modelCount;index++)
@@ -651,20 +693,24 @@ bool GraphicsClass::Render()
 // 	//Turn the Z buffer back on now that all 2D rendering has completed.
 // 	m_D3D->TurnZBufferOn();
 	// Present the rendered scene to the screen.
-	m_D3D->EndScene();
+	//m_D3D->EndScene();
 
 	return true;
 }
 
 bool GraphicsClass::RenderToTexture()
 {
+	D3DXMATRIX worldMatrix;
+	D3DXMATRIX reflectionMatrix
 	bool result;
 	// Set the render target to be the render to texture.
-	//m_RenderTexture->SetRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView());
+	m_RenderTexture->SetRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView());
 	//Clear the render to texture background to blue so we can differentiate it from the rest of the normal scene.
-	//m_RenderTexture->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(), 0.0f, 0.0f, 1.0f, 1.0f);
+	m_RenderTexture->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(), 0.0f, 0.0f, 1.0f, 1.0f);
+	//Use the camera to calculate the reflecitonMatrix;
+	m_Camera->RenderReflection(-1.5f);
 	// Render the scene now and it will draw to the render to texture instead of the back buffer.
-	result = RenderScene();
+	//result = RenderScene();
 	if (!result)
 	{
 		return false;
