@@ -15,7 +15,7 @@ float4 ReflectionPixelShader(PixelInputType input):SV_TARGET
 	float4 textureColor;
 	float2 reflectionTexCoord;
 	float4 reflectionColor;
-	float4 color
+	float4 color;
 
 	textureColor = shaderTexture.Sample(SampleType,input.tex);
 	reflectionTexCoord.x = input.reflectionPosition.x / input.reflectionPosition.w / 2.0f + 0.5f;

@@ -288,7 +288,7 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 // 	m_Light->SetSpecularColor(1.0f, 1.0f, 1.0f, 1.0f);
 // 	m_Light->SetSpecularPower(16.0f);
 // 
-// 	m_RenderTexture = new RenderTextureClass;
+ 	m_RenderTexture = new RenderTextureClass;
 	if (!m_RenderTexture)
 	{
 		return false;
@@ -552,8 +552,8 @@ bool GraphicsClass::Frame(float rotationY)
 
 bool GraphicsClass::Render()
 {
-	D3DXMATRIX worldMatrix, viewMatrix, projectionMatrix, orthoMatrix;
-	static float rotation = 0.0f;
+//	D3DXMATRIX worldMatrix, viewMatrix, projectionMatrix, orthoMatrix;
+//	static float rotation = 0.0f;
 // 	int modelCount;
 // 	int renderCount;
 // 	int index;
@@ -561,9 +561,9 @@ bool GraphicsClass::Render()
 // 	float positionY;
 // 	float positionZ;
 // 	float radius;
-	D3DXVECTOR4 fogColor = D3DXVECTOR4(0.5f, 0.5f, 0.5f, 1.0f);
-	D3DXVECTOR4 clipPlane = D3DXVECTOR4(0.5f, 1.0f, 0.0f, 0.0f);
-	float alpha = 0.5f;
+//	D3DXVECTOR4 fogColor = D3DXVECTOR4(0.5f, 0.5f, 0.5f, 1.0f);
+//	D3DXVECTOR4 clipPlane = D3DXVECTOR4(0.5f, 1.0f, 0.0f, 0.0f);
+//	float alpha = 0.5f;
 
 
 
@@ -575,15 +575,21 @@ bool GraphicsClass::Render()
 	{
 		return false;
 	}
-
-	// Clear the buffers to begin the scene.
-	//The second pass of our render is to the back buffer as normal.
-	m_D3D->BeginScene(0.0f, 0.0f, 0.0f, 1.0f);
-	//result = RenderScene();
+	result = RenderScene();
 	if (!result)
 	{
 		return false;
 	}
+	return true;
+
+	// Clear the buffers to begin the scene.
+	//The second pass of our render is to the back buffer as normal.
+	//m_D3D->BeginScene(0.0f, 0.0f, 0.0f, 1.0f);
+	//result = RenderScene();
+// 	if (!result)
+// 	{
+// 		return false;
+// 	}
 	//Then after the rendering is complete we render the 2D debug window so we can see the render to texture as a 2D image at the 50x50 pixel location.
 	//m_D3D->TurnZBufferOff();
 	
@@ -701,16 +707,30 @@ bool GraphicsClass::Render()
 bool GraphicsClass::RenderToTexture()
 {
 	D3DXMATRIX worldMatrix;
-	D3DXMATRIX reflectionMatrix
+	D3DXMATRIX reflectionMatrix;
+	D3DXMATRIX projectionMatrix;
+	static float rotation = 0.0f;
 	bool result;
 	// Set the render target to be the render to texture.
 	m_RenderTexture->SetRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView());
 	//Clear the render to texture background to blue so we can differentiate it from the rest of the normal scene.
-	m_RenderTexture->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(), 0.0f, 0.0f, 1.0f, 1.0f);
+	m_RenderTexture->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(), 0.0f, 0.0f, 0.0f, 1.0f);
 	//Use the camera to calculate the reflecitonMatrix;
 	m_Camera->RenderReflection(-1.5f);
 	// Render the scene now and it will draw to the render to texture instead of the back buffer.
 	//result = RenderScene();
+	reflectionMatrix = m_Camera->GetReflectionViewMatrix();
+	m_D3D->GetWorldMatrix(worldMatrix);
+	m_D3D->GetProjectionMatrix(projectionMatrix);
+	rotation += (float)D3DX_PI * 0.005f;
+	if (rotation > 360.0f)
+	{
+		rotation -= 360.0f;
+	}
+	D3DXMatrixRotationY(&worldMatrix, rotation);
+
+	m_Model1->Render(m_D3D->GetDeviceContext());
+	result = m_TextureShader->Render(m_D3D->GetDeviceContext(), m_Model1->GetIndexCount(), worldMatrix, reflectionMatrix, projectionMatrix, m_Model1->GetTexture());
 	if (!result)
 	{
 		return false;
@@ -723,6 +743,7 @@ bool GraphicsClass::RenderToTexture()
 bool GraphicsClass::RenderScene()
 {
 	D3DXMATRIX worldMatrix, viewMatrix, projectionMatrix, orthoMatrix;
+	D3DXMATRIX reflectionMatrix;
 	static float rotation = 0.0f;
 	// 	int modelCount;
 	// 	int renderCount;
@@ -748,7 +769,7 @@ bool GraphicsClass::RenderScene()
 	m_D3D->GetWorldMatrix(worldMatrix);
 	m_D3D->GetProjectionMatrix(projectionMatrix);
 	m_D3D->GetOrthoMatrix(orthoMatrix);
-	rotation += (float)D3DX_PI * 0.0025f;
+	rotation += (float)D3DX_PI * 0.005f;
 	if (rotation > 360.0f)
 	{
 		rotation -= 360.0f;
@@ -817,7 +838,18 @@ bool GraphicsClass::RenderScene()
 	// 	//Turn the Z buffer back on now that all 2D rendering has completed.
 	//m_D3D->TurnZBufferOn();
 	// Present the rendered scene to the screen.
-	m_D3D->EndScene();
+	m_Model1->Render(m_D3D->GetDeviceContext());
+	result = m_TextureShader->Render(m_D3D->GetDeviceContext(), m_Model1->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix, m_Model1->GetTexture());
+	if (!result)
+	{
+		return false;
+	}
 
+	m_D3D->GetWorldMatrix(worldMatrix);
+	D3DXMatrixTranslation(&worldMatrix, 0.0f, -1.5f, 0.0f);
+	reflectionMatrix = m_Camera->GetReflectionViewMatrix();
+	m_FloorModel->Render(m_D3D->GetDeviceContext());
+	result = m_ReflectionShader->Render(m_D3D->GetDeviceContext(), m_FloorModel->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix, m_FloorModel->GetTexture(), m_RenderTexture->GetShaderResourceView(), reflectionMatrix);
+	m_D3D->EndScene();
 	return true;
 }
