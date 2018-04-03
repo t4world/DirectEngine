@@ -31,6 +31,10 @@
 #include "clipplaneshaderclass.h"
 #include "transparentshaderClass.h"
 #include "reflectionshaderclass.h"
+#include "refractionshaderclass.h"
+#include "watershaderclass.h"
+#include "multpoinlLightshader.h"
+#include "pointlight.h"
 
 
 /////////////
@@ -58,7 +62,8 @@ public:
 
 private:
 	bool Render();
-	bool RenderToTexture();
+	bool RenderReflectionToTexture();
+	bool RenderRefractionToTexture();
 	bool RenderScene();
 
 private:
@@ -66,7 +71,7 @@ private:
 	CameraClass* m_Camera;
 	//ModelClass* m_Model;
 	//ColorShaderClass* m_ColorShader;
-	TextureShaderClass *m_TextureShader;
+	//TextureShaderClass *m_TextureShader;
 	//LightShaderClass *m_LightShader;
 	//LightClass *m_Light;
 	//BitmapClass *m_Bitmap;
@@ -76,15 +81,32 @@ private:
 	//MultiTextureShaderClass *m_MultiTextureShader;
 	//BumpMapShaderClass *m_BumpMapShader;
 	//SpecMapShaderClass* m_SpecMapShader;
-	RenderTextureClass *m_RenderTexture;
+// 	ModelClass1 *m_GroundModel;
+// 	ModelClass1 *m_WallModel;
+// 	ModelClass1 *m_BathModel;
+// 	ModelClass1 *m_WaterModel;
+// 	RenderTextureClass *m_ReflectionTexture;
+// 	RenderTextureClass *m_RefractionTexture;
+
 	//DebugWindowClass *m_DebuWindow;
-	ModelClass1 *m_Model1;
-	ModelClass1 *m_FloorModel;
+	//ModelClass1 *m_Model1;
+	//ModelClass1 *m_FloorModel;
 	//ModelClass1 *m_Model2;
 	//FogShaderClass *m_FogShader;
 	//ClipPlaneShaderClass *m_clipShader;
 	//TransparentShaderClass *m_transparentShader;
-	ReflectionShaderClass *m_ReflectionShader;
+	//ReflectionShaderClass *m_ReflectionShader;
+	//Refractionshaderclass *m_RefractionShader;
+	//Watershaderclass *m_WaterShader;
+	//float m_waterHeight;
+	//float m_waterTranslation;
+	ModelClass1 *m_Model1;
+	MultPointLightsShader *m_mulLightShader;
+	PointLight *m_light1;
+	PointLight *m_light2;
+	PointLight *m_light3;
+	PointLight *m_light4;
+
 };
 
 #endif

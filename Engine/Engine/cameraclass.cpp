@@ -119,7 +119,7 @@ void CameraClass::RenderReflection(float height)
 
 	// Setup the position of the camera in the world.
 	position.x = m_positionX;
-	position.y = -m_positionY + (2 *height);
+	position.y = -m_positionY + (2.0f *height);
 	position.z = m_positionZ;
 
 	// Setup where the camera is looking by default.
