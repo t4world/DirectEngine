@@ -35,6 +35,9 @@
 #include "watershaderclass.h"
 #include "multpoinlLightshader.h"
 #include "pointlight.h"
+#include "depthshaderclass.h"
+#include "instancetextureshaderclass.h"
+#include "modelclassinstance.h"
 
 
 /////////////
@@ -44,6 +47,9 @@ const bool FULL_SCREEN = false;
 const bool VSYNC_ENABLED = true;
 const float SCREEN_DEPTH = 1000.0f;
 const float SCREEN_NEAR = 0.1f;
+
+//const float SCREEN_DEPTH = 100.0f;
+//const float SCREEN_NEAR = 1.0f;
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -65,6 +71,13 @@ private:
 	bool RenderReflectionToTexture();
 	bool RenderRefractionToTexture();
 	bool RenderScene();
+
+	bool RenderBillBorad();
+
+	bool RenderDepth();
+
+	bool RenderInstanceModel();
+
 
 private:
 	D3DClass* m_D3D;
@@ -100,12 +113,19 @@ private:
 	//Watershaderclass *m_WaterShader;
 	//float m_waterHeight;
 	//float m_waterTranslation;
-	ModelClass1 *m_Model1;
-	MultPointLightsShader *m_mulLightShader;
-	PointLight *m_light1;
-	PointLight *m_light2;
-	PointLight *m_light3;
-	PointLight *m_light4;
+// 	ModelClass1 *m_Model1;
+// 	MultPointLightsShader *m_mulLightShader;
+// 	PointLight *m_light1;
+// 	PointLight *m_light2;
+// 	PointLight *m_light3;
+// 	PointLight *m_light4;
+	TextureShaderClass *m_TextureShader;
+	ModelClass1 *m_FloorModel;
+	ModelClass1 *m_BillboardModel;
+	DepthShaderClass *m_depthShaderClass;
+
+	ModelClassInstance *m_InstanceModel;
+	InstanceTextureShaderClass *m_instanceTextureShader;
 
 };
 

@@ -38,11 +38,19 @@ GraphicsClass::GraphicsClass()
 // 	m_RefractionShader = 0;
 // 	m_RefractionShader = 0;
 // 	m_WaterShader = 0;
-	m_mulLightShader = 0;
-	m_light1 = 0;
-	m_light2 = 0;
-	m_light3 = 0;
-	m_light4 = 0;
+// 	m_Model1 = 0;
+// 	m_mulLightShader = 0;
+// 	m_light1 = 0;
+// 	m_light2 = 0;
+// 	m_light3 = 0;
+// 	m_light4 = 0;
+
+	m_TextureShader = 0;
+	m_FloorModel = 0;
+	m_BillboardModel = 0;
+	m_depthShaderClass = 0;
+	m_InstanceModel = 0;
+	m_instanceTextureShader = 0;
 
 }
 
@@ -410,18 +418,18 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 // 	}
 
 	//Create the texture shader object
-// 	m_TextureShader = new TextureShaderClass;
-// 	if (!m_TextureShader)
-// 	{
-// 	 	return false;
-// 	}
-// 	//Initialzie the texture shader object.
-// 	result = m_TextureShader->Initialize(m_D3D->GetDevice(), hwnd);
-// 	if(!result)
-// 	{
-// 	 	MessageBox(hwnd, L"Could not initialize the texture  shader object.", L"Error", MB_OK);
-// 	 	return false;
-// 	}
+	m_TextureShader = new TextureShaderClass;
+	if (!m_TextureShader)
+	{
+	 	return false;
+	}
+	//Initialzie the texture shader object.
+	result = m_TextureShader->Initialize(m_D3D->GetDevice(), hwnd);
+	if(!result)
+	{
+	 	MessageBox(hwnd, L"Could not initialize the texture  shader object.", L"Error", MB_OK);
+	 	return false;
+	}
 
 // 	m_ReflectionShader = new ReflectionShaderClass;
 // 	if (!m_ReflectionShader)
@@ -466,59 +474,121 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 //  	m_waterHeight = 2.75f;
 //  	m_waterTranslation = 0.0f;
 
- 	m_Model1 = new ModelClass1;
- 	if (!m_Model1)
- 	{
- 		return false;
- 	}
- 
- 	// Initialize the model object.
- 	result = m_Model1->Initialize(m_D3D->GetDevice(), "../Engine/data/plane01.txt", L"../Engine/data/stone01.dds");
- 	if (!result)
- 	{
- 		MessageBox(hwnd, L"Could not initialize the model object.", L"Error", MB_OK);
- 		return false;
- 	}
+//  	m_Model1 = new ModelClass1;
+//  	if (!m_Model1)
+//  	{
+//  		return false;
+//  	}
+//  
+//  	// Initialize the model object.
+//  	result = m_Model1->Initialize(m_D3D->GetDevice(), "../Engine/data/plane01.txt", L"../Engine/data/stone01.dds");
+//  	if (!result)
+//  	{
+//  		MessageBox(hwnd, L"Could not initialize the model object.", L"Error", MB_OK);
+//  		return false;
+//  	}
+// 
+// 	m_mulLightShader = new MultPointLightsShader;
+// 	if (!m_mulLightShader)
+// 	{
+// 		return false;
+// 	}
+// 	result = m_mulLightShader->Initialize(m_D3D->GetDevice(), hwnd);
+// 	if (!result)
+// 	{
+// 		return false;
+// 	}
+// 
+// 	m_light1 = new PointLight;
+// 	if (!m_light1)
+// 	{
+// 		return false;
+// 	}
+// 	m_light1->SetDiffuseColor(1.0f, 0.0f, 0.0f, 1.0f);
+// 	m_light1->SetPosition(-3.0f, 1.0f, 3.0f);
+// 	m_light2 = new PointLight;
+// 	if (!m_light2)
+// 	{
+// 		return false;
+// 	}
+// 	m_light2->SetDiffuseColor(0.0f, 1.0f, 0.0f, 1.0f);
+// 	m_light2->SetPosition(3.0f, 1.0f, 3.0f);
+// 	m_light3 = new PointLight;
+// 	if (!m_light3)
+// 	{
+// 		return false;
+// 	}
+// 	m_light3->SetDiffuseColor(0.0f, 0.0f, 1.0f, 1.0f);
+// 	m_light3->SetPosition(-3.0f, 1.0f, -3.0f);
+// 	m_light4 = new PointLight;
+// 	if (!m_light4)
+// 	{
+// 		return false;
+// 	}
+// 	m_light4->SetDiffuseColor(1.0f, 1.0f, 1.0f, 1.0f);
+// 	m_light4->SetPosition(3.0f, 1.0f, -3.0f);
 
-	m_mulLightShader = new MultPointLightsShader;
-	if (!m_mulLightShader)
+	m_FloorModel = new ModelClass1;
+	if (!m_FloorModel)
 	{
 		return false;
 	}
-	result = m_mulLightShader->Initialize(m_D3D->GetDevice(), hwnd);
+	result = m_FloorModel->Initialize(m_D3D->GetDevice(), "../Engine/data/floor.txt", L"../Engine/data/grid01.dds");
 	if (!result)
 	{
+		MessageBox(hwnd, L"Could not initialize the model object.", L"Error", MB_OK);
 		return false;
 	}
 
-	m_light1 = new PointLight;
-	if (!m_light1)
+	m_BillboardModel = new ModelClass1;
+	if (!m_BillboardModel)
 	{
 		return false;
 	}
-	m_light1->SetDiffuseColor(1.0f, 0.0f, 0.0f, 1.0f);
-	m_light1->SetPosition(-3.0f, 1.0f, 3.0f);
-	m_light2 = new PointLight;
-	if (!m_light2)
+	result = m_BillboardModel->Initialize(m_D3D->GetDevice(), "../Engine/data/square.txt", L"../Engine/data/seafloor.dds");
+	if (!result)
+	{
+		MessageBox(hwnd, L"Could not initialize the model object.", L"Error", MB_OK);
+		return false;
+	}
+
+	m_depthShaderClass = new DepthShaderClass;
+	if (!m_depthShaderClass)
 	{
 		return false;
 	}
-	m_light2->SetDiffuseColor(0.0f, 1.0f, 0.0f, 1.0f);
-	m_light2->SetPosition(3.0f, 1.0f, 3.0f);
-	m_light3 = new PointLight;
-	if (!m_light3)
+	//Initialzie the texture shader object.
+	result = m_depthShaderClass->Initialize(m_D3D->GetDevice(), hwnd);
+	if (!result)
+	{
+		MessageBox(hwnd, L"Could not initialize the texture  shader object.", L"Error", MB_OK);
+		return false;
+	}
+
+	m_InstanceModel = new ModelClassInstance;
+	if (!m_InstanceModel)
 	{
 		return false;
 	}
-	m_light3->SetDiffuseColor(0.0f, 0.0f, 1.0f, 1.0f);
-	m_light3->SetPosition(-3.0f, 1.0f, -3.0f);
-	m_light4 = new PointLight;
-	if (!m_light4)
+	result = m_InstanceModel->Initialize(m_D3D->GetDevice(), L"../Engine/data/seafloor.dds");
+	if (!result)
+	{
+		MessageBox(hwnd, L"Could not initialize the model object.", L"Error", MB_OK);
+		return false;
+	}
+
+	m_instanceTextureShader = new InstanceTextureShaderClass;
+	if (!m_instanceTextureShader)
 	{
 		return false;
 	}
-	m_light4->SetDiffuseColor(1.0f, 1.0f, 1.0f, 1.0f);
-	m_light4->SetPosition(3.0f, 1.0f, -3.0f);
+	//Initialzie the texture shader object.
+	result = m_instanceTextureShader->Initialize(m_D3D->GetDevice(), hwnd);
+	if (!result)
+	{
+		MessageBox(hwnd, L"Could not initialize the texture  shader object.", L"Error", MB_OK);
+		return false;
+	}
 	return true;
 }
 
@@ -718,44 +788,85 @@ void GraphicsClass::Shutdown()
 	// 	}
 
 
-	if (m_light1)
+	// 	if (m_light1)
+	// 	{
+	// 		delete m_light1;
+	// 		m_light1 = 0;
+	// 	}
+	// 
+	// 	if (m_light2)
+	// 	{
+	// 		delete m_light2;
+	// 		m_light2 = 0;
+	// 	}
+	// 
+	// 	if (m_light3)
+	// 	{
+	// 		delete m_light3;
+	// 		m_light3 = 0;
+	// 	}
+	// 
+	// 	if (m_light4)
+	// 	{
+	// 		delete m_light4;
+	// 		m_light4 = 0;
+	// 	}
+	// 
+	// 	if (m_mulLightShader)
+	// 	{
+	// 		m_mulLightShader->Shutdown();
+	// 		delete m_mulLightShader;
+	// 		m_mulLightShader = 0;
+	// 	}
+	// 
+	// 	if (m_Model1)
+	// 	{
+	// 		m_Model1->Shutdown();
+	// 		delete m_Model1;
+	// 		m_Model1 = 0;
+	// 	}
+
+	if (m_instanceTextureShader)
 	{
-		delete m_light1;
-		m_light1 = 0;
+		m_instanceTextureShader->Shutdown();
+		delete m_instanceTextureShader;
+		m_instanceTextureShader = 0;
 	}
 
-	if (m_light2)
+	if (m_InstanceModel)
 	{
-		delete m_light2;
-		m_light2 = 0;
+		m_InstanceModel->Shutdown();
+		delete m_InstanceModel;
+		m_InstanceModel = 0;
 	}
 
-	if (m_light3)
+	if (m_depthShaderClass)
 	{
-		delete m_light3;
-		m_light3 = 0;
+		m_depthShaderClass->Shutdown();
+		delete m_depthShaderClass;
+		m_depthShaderClass = 0;
 	}
 
-	if (m_light4)
+	if (m_BillboardModel)
 	{
-		delete m_light4;
-		m_light4 = 0;
+		m_BillboardModel->Shutdown();
+		delete m_BillboardModel;
+		m_BillboardModel = 0;
 	}
 
-	if (m_mulLightShader)
+	if (m_FloorModel)
 	{
-		m_mulLightShader->Shutdown();
-		delete m_mulLightShader;
-		m_mulLightShader = 0;
+		m_FloorModel->Shutdown();
+		delete m_FloorModel;
+		m_FloorModel = 0;
 	}
 
-	if (m_Model1)
+	if (m_TextureShader)
 	{
-		m_Model1->Shutdown();
-		delete m_Model1;
-		m_Model1 = 0;
+		m_TextureShader->Shutdown();
+		delete m_TextureShader;
+		m_TextureShader = 0;
 	}
-
 
 	// Release the camera object.
 	if (m_Camera)
@@ -792,8 +903,10 @@ bool GraphicsClass::Frame(float rotationY)
 // 	{
 // 		m_waterTranslation -= 1.0f;
 // 	}
-	m_Camera->SetPosition(0.0f, 2.0f, -12.0f);
+	//m_Camera->SetPosition(0.0f, 2.0f, -12.0f);
 	//m_Camera->SetRotation(0.0, 45.0f, 0.0f);
+	//m_Camera->SetPosition(1.0f, 1.0f, -10.0f);
+	m_Camera->SetPosition(0.0f, 0.0f, -10.0f);
 	result = Render();
 	if(!result)
 	{
@@ -835,12 +948,35 @@ bool GraphicsClass::Render()
 // 	{
 // 		return false;
 // 	}
-	result = RenderScene();
+// 	result = RenderScene();
+// 	if (!result)
+// 	{
+// 		return false;
+// 	}
+// 	return true;
+
+// 	result = RenderBillBorad();
+// 	if (!result)
+// 	{
+// 		return false;
+// 	}
+// 	return true;
+
+// 	result = RenderDepth();
+// 	if (!result)
+// 	{
+// 		return false;
+// 	}
+// 	return true;
+
+	result = RenderInstanceModel();
 	if (!result)
 	{
 		return false;
 	}
 	return true;
+	
+	
 
 	// Clear the buffers to begin the scene.
 	//The second pass of our render is to the back buffer as normal.
@@ -1079,17 +1215,17 @@ bool GraphicsClass::RenderScene()
 	bool result;
 	// 	bool renderModel;
 
-	diffuseColor[0] = m_light1->GetDiffuseColor();
-	diffuseColor[1] = m_light2->GetDiffuseColor();
-	diffuseColor[2] = m_light3->GetDiffuseColor();
-	diffuseColor[3] = m_light4->GetDiffuseColor();
-
-	lightPosition[0] = m_light1->GetPosition();
-	lightPosition[1] = m_light2->GetPosition();
-
-	lightPosition[2] = m_light3->GetPosition();
-
-	lightPosition[3] = m_light4->GetPosition();
+// 	diffuseColor[0] = m_light1->GetDiffuseColor();
+// 	diffuseColor[1] = m_light2->GetDiffuseColor();
+// 	diffuseColor[2] = m_light3->GetDiffuseColor();
+// 	diffuseColor[3] = m_light4->GetDiffuseColor();
+// 
+// 	lightPosition[0] = m_light1->GetPosition();
+// 	lightPosition[1] = m_light2->GetPosition();
+// 
+// 	lightPosition[2] = m_light3->GetPosition();
+// 
+// 	lightPosition[3] = m_light4->GetPosition();
 
 
 
@@ -1261,14 +1397,95 @@ bool GraphicsClass::RenderScene()
 	// 		return false;
 	// 	}
 
-	m_Model1->Render(m_D3D->GetDeviceContext());
-	result = m_mulLightShader->Render(m_D3D->GetDeviceContext(), m_Model1->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix, m_Model1->GetTexture(), diffuseColor, lightPosition);
+// 	m_Model1->Render(m_D3D->GetDeviceContext());
+// 	result = m_mulLightShader->Render(m_D3D->GetDeviceContext(), m_Model1->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix, m_Model1->GetTexture(), diffuseColor, lightPosition);
+// 	if (!result)
+// 	{
+// 		return false;
+// 	}
+
+
+	m_D3D->EndScene();
+	return true;
+}
+
+bool GraphicsClass::RenderBillBorad()
+{
+	D3DXMATRIX worldMatrix, viewMatrix, projectionMatrix;
+	D3DXMATRIX translateMatrix;
+	bool result;
+	D3DXVECTOR3 cameraPosition;
+	D3DXVECTOR3 modelPosition;
+	double angle;
+	float rotation;
+
+	m_D3D->BeginScene(0.0f, 0.0f, 0.0f, 1.0f);
+	m_Camera->Render();
+	m_Camera->GetViewMatrix(viewMatrix);
+	m_D3D->GetWorldMatrix(worldMatrix);
+	m_D3D->GetProjectionMatrix(projectionMatrix);
+	m_FloorModel->Render(m_D3D->GetDeviceContext());
+	result = m_TextureShader->Render(m_D3D->GetDeviceContext(), m_FloorModel->GetIndexCount(),worldMatrix,viewMatrix,projectionMatrix,m_FloorModel->GetTexture());
 	if (!result)
 	{
 		return false;
 	}
 
 
+	cameraPosition = m_Camera->GetPosition();
+
+	modelPosition.x = 0.0f;
+	modelPosition.y = 1.5f;
+	modelPosition.z = 0.0f;
+
+	rotation = atan2(modelPosition.x - cameraPosition.x,modelPosition.z - cameraPosition.z);
+	D3DXMatrixRotationY(&worldMatrix, rotation);
+	D3DXMatrixTranslation(&translateMatrix, modelPosition.x, modelPosition.y, modelPosition.z);
+	D3DXMatrixMultiply(&worldMatrix, &worldMatrix, &translateMatrix);
+	m_BillboardModel->Render(m_D3D->GetDeviceContext());
+	result = m_TextureShader->Render(m_D3D->GetDeviceContext(),m_BillboardModel->GetIndexCount(),worldMatrix,viewMatrix,projectionMatrix,m_BillboardModel->GetTexture());
 	m_D3D->EndScene();
 	return true;
 }
+
+bool GraphicsClass::RenderDepth()
+{
+	D3DXMATRIX worldMatrix, viewMatrix, projectionMatrix;
+	bool result;
+
+	m_D3D->BeginScene(0.0f, 0.0f, 0.0f, 1.0f);
+	m_Camera->Render();
+	m_Camera->GetViewMatrix(viewMatrix);
+	m_D3D->GetWorldMatrix(worldMatrix);
+	m_D3D->GetProjectionMatrix(projectionMatrix);
+	m_FloorModel->Render(m_D3D->GetDeviceContext());
+	result = m_depthShaderClass->Render(m_D3D->GetDeviceContext(), m_FloorModel->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
+	if (!result)
+	{
+		return false;
+	}
+	m_D3D->EndScene();
+	return true;
+}
+
+bool GraphicsClass::RenderInstanceModel()
+{
+	D3DXMATRIX worldMatrix, viewMatrix, projectionMatrix;
+	bool result;
+
+	m_D3D->BeginScene(0.0f, 0.0f, 0.0f, 1.0f);
+	m_Camera->Render();
+	m_Camera->GetViewMatrix(viewMatrix);
+	m_D3D->GetWorldMatrix(worldMatrix);
+	m_D3D->GetProjectionMatrix(projectionMatrix);
+	m_InstanceModel->Render(m_D3D->GetDeviceContext());
+	result = m_instanceTextureShader->Render(m_D3D->GetDeviceContext(), m_InstanceModel->GetVertexCount(), m_InstanceModel->GetInstanceCount(), worldMatrix, viewMatrix, projectionMatrix, m_InstanceModel->GetTexture());
+	if (!result)
+	{
+		return false;
+	}
+	m_D3D->EndScene();
+	return true;
+}
+
+

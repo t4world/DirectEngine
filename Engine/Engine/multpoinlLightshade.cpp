@@ -158,7 +158,7 @@ bool MultPointLightsShader::InitializeShader(ID3D11Device *device, HWND hwnd, WC
 
 	//Create the texture sampler state
 	result = device->CreateSamplerState(&samplerDesc, &m_sampleState);
-	if (false(result))
+	if (FAILED(result))
 	{
 		return false;
 	}
@@ -340,7 +340,7 @@ bool MultPointLightsShader::SetShaderParamters(ID3D11DeviceContext *deviceContex
 	dataPtr2->diffuseColor[1] = diffuseColor[1];
 	dataPtr2->diffuseColor[2] = diffuseColor[2];
 	dataPtr2->diffuseColor[3] = diffuseColor[3];
-
+	deviceContext->Unmap(m_lightColorBuffer, 0);
 	//Unlock the constant buffer.
 	//Set the position of the light constant buffer in the pixel shader.
 	bufferNumber = 0;
